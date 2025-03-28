@@ -13,38 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.samples.petclinic.model;
+package org.springframework.samples.petclinic.infrastructure.model;
 
-import jakarta.persistence.Column;
+import java.io.Serializable;
+import java.util.UUID;
+
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
-import jakarta.validation.constraints.NotBlank;
 
 /**
- * Simple JavaBean domain object adds a name property to <code>BaseEntity</code>. Used as
- * a base class for objects needing these properties.
+ * Simple JavaBean domain object with an id property. Used as a base class for objects
+ * needing this property.
  *
  * @author Ken Krebs
  * @author Juergen Hoeller
- * @author Wick Dynex
  */
 @MappedSuperclass
-public class NamedEntity extends BaseEntity {
+public class BaseEntity implements Serializable {
 
-	@Column(name = "name")
-	@NotBlank
-	private String name;
+	@Id
+	private UUID id;
 
-	public String getName() {
-		return this.name;
+	public UUID getId() {
+		return id;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setId(UUID id) {
+		this.id = id;
 	}
 
-	@Override
-	public String toString() {
-		return this.getName();
+	public boolean isNew() {
+		return this.id == null;
 	}
 
 }

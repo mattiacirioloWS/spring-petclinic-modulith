@@ -17,7 +17,7 @@
 package org.springframework.samples.petclinic.service;
 
 import org.springframework.orm.ObjectRetrievalFailureException;
-import org.springframework.samples.petclinic.model.BaseEntity;
+import org.springframework.samples.petclinic.infrastructure.model.BaseEntity;
 
 import java.util.Collection;
 
@@ -27,7 +27,7 @@ import java.util.Collection;
  *
  * @author Juergen Hoeller
  * @author Sam Brannen
- * @see org.springframework.samples.petclinic.model.BaseEntity
+ * @see org.springframework.samples.petclinic.infrastructure.model.BaseEntity
  * @since 29.10.2003
  */
 public abstract class EntityUtils {
@@ -40,14 +40,12 @@ public abstract class EntityUtils {
 	 * @return the found entity
 	 * @throws ObjectRetrievalFailureException if the entity was not found
 	 */
-	public static <T extends BaseEntity> T getById(Collection<T> entities, Class<T> entityClass, int entityId)
-			throws ObjectRetrievalFailureException {
-		for (T entity : entities) {
-			if (entity.getId() == entityId && entityClass.isInstance(entity)) {
-				return entity;
-			}
-		}
-		throw new ObjectRetrievalFailureException(entityClass, entityId);
-	}
+	/*
+	 * public static <T extends BaseEntity> T getById(Collection<T> entities, Class<T>
+	 * entityClass, int entityId) throws ObjectRetrievalFailureException { for (T entity :
+	 * entities) { if (entity.getId() == entityId && entityClass.isInstance(entity)) {
+	 * return entity; } } throw new ObjectRetrievalFailureException(entityClass,
+	 * entityId); }
+	 */
 
 }

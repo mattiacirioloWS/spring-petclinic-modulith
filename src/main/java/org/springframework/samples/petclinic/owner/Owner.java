@@ -17,9 +17,10 @@ package org.springframework.samples.petclinic.owner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.core.style.ToStringCreator;
-import org.springframework.samples.petclinic.model.Person;
+import org.springframework.samples.petclinic.infrastructure.model.Person;
 import org.springframework.util.Assert;
 
 import jakarta.persistence.CascadeType;
@@ -113,10 +114,10 @@ public class Owner extends Person {
 	 * @param id to test
 	 * @return the Pet with the given id, or null if no such Pet exists for this Owner
 	 */
-	public Pet getPet(Integer id) {
+	public Pet getPet(UUID id) {
 		for (Pet pet : getPets()) {
 			if (!pet.isNew()) {
-				Integer compId = pet.getId();
+				UUID compId = pet.getId();
 				if (compId.equals(id)) {
 					return pet;
 				}
@@ -160,7 +161,7 @@ public class Owner extends Person {
 	 * @param petId the identifier of the {@link Pet}, must not be {@literal null}.
 	 * @param visit the visit to add, must not be {@literal null}.
 	 */
-	public void addVisit(Integer petId, Visit visit) {
+	public void addVisit(UUID petId, Visit visit) {
 
 		Assert.notNull(petId, "Pet identifier must not be null!");
 		Assert.notNull(visit, "Visit must not be null!");

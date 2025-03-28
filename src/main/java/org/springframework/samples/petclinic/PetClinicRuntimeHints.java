@@ -18,8 +18,8 @@ package org.springframework.samples.petclinic;
 
 import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.RuntimeHintsRegistrar;
-import org.springframework.samples.petclinic.model.BaseEntity;
-import org.springframework.samples.petclinic.model.Person;
+import org.springframework.samples.petclinic.infrastructure.model.BaseEntity;
+import org.springframework.samples.petclinic.infrastructure.model.Person;
 import org.springframework.samples.petclinic.vet.Vet;
 
 public class PetClinicRuntimeHints implements RuntimeHintsRegistrar {
