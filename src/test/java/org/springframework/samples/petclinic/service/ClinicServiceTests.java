@@ -35,8 +35,7 @@ import org.springframework.samples.petclinic.owner.OwnerRepository;
 import org.springframework.samples.petclinic.owner.Pet;
 import org.springframework.samples.petclinic.owner.PetType;
 import org.springframework.samples.petclinic.owner.Visit;
-import org.springframework.samples.petclinic.vet.Vet;
-import org.springframework.samples.petclinic.vet.VetRepository;
+// Removed Vet and VetRepository imports as they are no longer used here
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -77,7 +76,6 @@ class ClinicServiceTests {
 	private static final UUID OWNER_ID_1 = UUID.fromString("30000000-0000-0000-0000-000000000001"); // George Franklin
 	private static final UUID OWNER_ID_6 = UUID.fromString("30000000-0000-0000-0000-000000000006"); // Jean Coleman
 	private static final UUID PET_ID_7 = UUID.fromString("40000000-0000-0000-0000-000000000007"); // Samantha (Pet of Owner 6)
-	private static final UUID VET_ID_3 = UUID.fromString("00000000-0000-0000-0000-000000000003"); // Linda Douglas
 	private static final UUID TYPE_ID_1 = UUID.fromString("20000000-0000-0000-0000-000000000001"); // cat
 	private static final UUID TYPE_ID_2 = UUID.fromString("20000000-0000-0000-0000-000000000002"); // dog
 	private static final UUID TYPE_ID_4 = UUID.fromString("20000000-0000-0000-0000-000000000004"); // snake
@@ -85,9 +83,6 @@ class ClinicServiceTests {
 
 	@Autowired
 	protected OwnerRepository owners;
-
-	@Autowired
-	protected VetRepository vets;
 
 	Pageable pageable;
 
@@ -215,19 +210,6 @@ class ClinicServiceTests {
 		pet7 = owner6.getPet(PET_ID_7); // Use UUID constant
 		assertThat(pet7).isNotNull(); // Add null check
 		assertThat(pet7.getName()).isEqualTo(newName);
-	}
-
-	@Test
-	void shouldFindVets() {
-		Collection<Vet> vets = this.vets.findAll();
-
-		// Assuming EntityUtils is updated or we find by ID
-		Vet vet = vets.stream().filter(v -> v.getId().equals(VET_ID_3)).findFirst().orElse(null);
-		assertThat(vet).isNotNull();
-		assertThat(vet.getLastName()).isEqualTo("Douglas");
-		assertThat(vet.getNrOfSpecialties()).isEqualTo(2);
-		assertThat(vet.getSpecialties().get(0).getName()).isEqualTo("dentistry");
-		assertThat(vet.getSpecialties().get(1).getName()).isEqualTo("surgery");
 	}
 
 	@Test

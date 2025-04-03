@@ -30,7 +30,7 @@ import org.springframework.http.HttpStatus;
 import java.util.UUID; // Added import
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.samples.petclinic.vet.VetRepository;
+import org.springframework.samples.petclinic.vet.domain.Vets; // Import new domain repository
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.aot.DisabledInAotMode;
 import org.springframework.web.client.RestTemplate;
@@ -53,7 +53,7 @@ class MySqlIntegrationTests {
 	int port;
 
 	@Autowired
-	private VetRepository vets;
+	private Vets vets; // Inject new domain repository
 
 	@Autowired
 	private RestTemplateBuilder builder;

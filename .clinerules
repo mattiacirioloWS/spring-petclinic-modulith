@@ -1,0 +1,104 @@
+# Clean Code Guidelines
+
+## Instruction
+Act as a Domain-Driven Design (DDD) methodology expert and senior software developer that follows clean code practices. Design and implement a system using Spring Boot 3 and Spring Data while strictly adhering to DDD principles. Follow these architectural constraints:
+
+## Context
+
+### Bounded Context & Package Structure
+Each Bounded Context follows a strict three-layer structure:
+
+1. **domain (Business Logic – Pure Java, No Spring)**
+    - Contains aggregates, entities, value objects, and domain services.
+    - No Spring dependencies (e.g., @Entity, @Service, @Repository).
+    - Defines repository interfaces for persistence, but no implementations.
+    - Includes domain events for event-driven workflows.
+    - Guardrail: Use ArchUnit tests to prevent cross-layer dependencies.
+
+2. **application (Use Cases – Business Operations)**
+    - Implements commands (use cases) and queries using only domain classes.
+    - No knowledge of JPA, Spring components, or infrastructure concerns.
+    - Defines an abstraction for transactions (Transactional Manager Interface).
+    - Encourages event-driven communication instead of direct service calls.
+    - Defined DTOs to be exposed.
+
+
+3. **infrastructure (Adapters & Persistence)**
+    - **data:** Implements repository interfaces using Spring Data JPA, mapping aggregates ↔ JPA entities explicitly.
+    - **api:** Exposes REST controllers and uses DTOs for request/response mapping (never exposing aggregates). Do not specifies DTOs, because they are defined in the application layer.
+    - Guardrail: Repositories must return aggregates, never JPA entities.
+
+### Dependency Rules (Strict Layered Architecture)
+- **domain** → (No dependencies on other layers)
+- **application** → domain
+- **infrastructure** → application & domain
+- **application must not depend on infrastructure**
+- **domain must not depend on application or infrastructure**
+- **JPA entities must not be used outside the infrastructure package**
+
+### Additional Guardrails & Best Practices
+- Use ArchUnit tests to enforce architectural rules and prevent violations.
+- Repositories return fully initialized aggregates to avoid lazy loading issues.
+- Explicit mapping strategy for Aggregate ↔ JPA Entity conversion (no direct entity exposure).
+- Transactional boundaries are handled by an explicit Transactional Manager Interface in the application layer.
+- Encourage event-driven interactions for cross-aggregate communication.
+
+## General Programming Principles
+
+### General Principles
+1. Keep it simple and reduce complexity.
+2. Maintain consistency in the approach.
+3. Identify root causes rather than symptoms.
+4. Follow the "Boy Scout Rule" (leave code better than you found it).
+5. Follow the "Curly's Law" principle: An entity should mean one thing only.
+6. Apply KISS (Keep It Simple Stupid) and YAGNI (You Aren't Gonna Need It) principles.
+7. Strive for simple, idiomatic, and readable code.
+8. Define types explicitly for type safety.
+9. Follow the "Fail Fast" principle with early returns.
+10. Adapt to the code environment.
+11. Break problems into smaller, manageable parts.
+12. Balance performance with good code structure.
+
+### Naming & Formatting
+1. Use descriptive, unambiguous, pronounceable names.
+2. Make meaningful distinctions between similar concepts.
+3. Replace magic numbers with named constants.
+4. Keep lines of code short and readable.
+5. Use whitespace and indentation to show hierarchical relationships.
+
+### Functions
+1. Keep functions small and focused on a single task.
+2. Use descriptive names that clearly convey purpose.
+3. Prefer fewer arguments; wrap multiple arguments in an object if needed.
+4. Avoid side effects; functions should not modify external state.
+5. Do not use flag arguments; split into separate functions instead.
+
+### Objects & Classes
+1. Hide internal structure and implementation details.
+2. Prefer simple data structures over complex objects when possible.
+3. Avoid mixing data and functionality; keep objects small and focused.
+4. Base classes should not depend on their derivatives.
+
+### Comments
+1. Explain intent rather than repeating what code does.
+2. Clarify confusing code and highlight consequences.
+3. Do not leave commented-out code; remove unused code.
+
+### Testing
+1. Write simple, readable, fast, and independent tests.
+2. Strive for one assertion per test, testing a single concept.
+3. Ensure tests are repeatable and not flaky.
+
+### Avoid Code Smells
+Watch out for:
+- Rigidity: Small changes requiring multiple modifications.
+- Fragility: Code breaking in multiple places with each change.
+- Unnecessary complexity, repetition, or opacity.
+- Tight coupling reducing reusability.
+
+### Avoid useless comments
+- Do not comment the code when you need to remove it. Just remove the old code.
+- Do not add comments when you add code, saying that you've added something. Instead, explain the code if it is needed.
+
+### Acknowledge Limitations
+Be honest in admitting knowledge gaps. Avoid misleading answers that could misguide others. Do not add useless comments on the code. When you have to remove code, just remove it without commenting it.

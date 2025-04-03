@@ -20,7 +20,8 @@ import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.RuntimeHintsRegistrar;
 import org.springframework.samples.petclinic.model.BaseEntity;
 import org.springframework.samples.petclinic.model.Person;
-import org.springframework.samples.petclinic.vet.Vet;
+// Import the new domain Vet class
+import org.springframework.samples.petclinic.vet.domain.Vet;
 
 public class PetClinicRuntimeHints implements RuntimeHintsRegistrar {
 
@@ -31,7 +32,8 @@ public class PetClinicRuntimeHints implements RuntimeHintsRegistrar {
 		hints.resources().registerPattern("mysql-default-conf");
 		hints.serialization().registerType(BaseEntity.class);
 		hints.serialization().registerType(Person.class);
-		hints.serialization().registerType(Vet.class);
+		// Register the new domain Vet class for serialization
+		hints.serialization().registerType(org.springframework.samples.petclinic.vet.domain.Vet.class);
 	}
 
 }
