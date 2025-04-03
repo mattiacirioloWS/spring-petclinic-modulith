@@ -16,6 +16,7 @@
 
 package org.springframework.samples.petclinic.vet;
 
+import java.util.UUID; // Added import
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,7 +56,7 @@ class VetControllerTests {
 		Vet james = new Vet();
 		james.setFirstName("James");
 		james.setLastName("Carter");
-		james.setId(1);
+		james.setId(UUID.fromString("00000000-0000-0000-0000-000000000001")); // Use UUID
 		return james;
 	}
 
@@ -63,9 +64,9 @@ class VetControllerTests {
 		Vet helen = new Vet();
 		helen.setFirstName("Helen");
 		helen.setLastName("Leary");
-		helen.setId(2);
+		helen.setId(UUID.fromString("00000000-0000-0000-0000-000000000002")); // Use UUID
 		Specialty radiology = new Specialty();
-		radiology.setId(1);
+		radiology.setId(UUID.fromString("10000000-0000-0000-0000-000000000001")); // Use UUID
 		radiology.setName("radiology");
 		helen.addSpecialty(radiology);
 		return helen;
@@ -94,7 +95,7 @@ class VetControllerTests {
 		ResultActions actions = mockMvc.perform(get("/vets").accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk());
 		actions.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-			.andExpect(jsonPath("$.vetList[0].id").value(1));
+			.andExpect(jsonPath("$.vetList[0].id").value("00000000-0000-0000-0000-000000000001")); // Assert UUID string
 	}
 
 }

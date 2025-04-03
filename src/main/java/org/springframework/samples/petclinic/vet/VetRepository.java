@@ -23,6 +23,7 @@ import org.springframework.data.repository.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.UUID; // Added import
 
 /**
  * Repository class for <code>Vet</code> domain objects All method names are compliant
@@ -35,7 +36,7 @@ import java.util.Collection;
  * @author Sam Brannen
  * @author Michael Isvy
  */
-public interface VetRepository extends Repository<Vet, Integer> {
+public interface VetRepository extends Repository<Vet, UUID> {
 
 	/**
 	 * Retrieve all <code>Vet</code>s from the data store.

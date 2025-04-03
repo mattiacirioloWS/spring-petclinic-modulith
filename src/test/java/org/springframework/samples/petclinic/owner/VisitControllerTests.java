@@ -33,6 +33,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
+import java.util.UUID; // Added import
 
 /**
  * Test class for {@link VisitController}
@@ -45,9 +46,8 @@ import java.util.Optional;
 @DisabledInAotMode
 class VisitControllerTests {
 
-	private static final int TEST_OWNER_ID = 1;
-
-	private static final int TEST_PET_ID = 1;
+	private static final UUID TEST_OWNER_ID = UUID.fromString("30000000-0000-0000-0000-000000000001"); // Use UUID
+	private static final UUID TEST_PET_ID = UUID.fromString("40000000-0000-0000-0000-000000000001"); // Use UUID
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -58,15 +58,21 @@ class VisitControllerTests {
 	@BeforeEach
 	void init() {
 		Owner owner = new Owner();
+		owner.setId(TEST_OWNER_ID); // Set owner ID
 		Pet pet = new Pet();
+		// Add pet before setting ID so it's considered "new" by addPet
 		owner.addPet(pet);
-		pet.setId(TEST_PET_ID);
-		given(this.owners.findById(TEST_OWNER_ID)).willReturn(Optional.of(owner));
+		pet.setId(TEST_PET_ID); // Set ID after adding
+
+		// No need to mock owner.getPet() as the owner object itself is real and contains the pet
+		// The controller will call getPet on the owner object returned by the mocked repository
+
+		given(this.owners.findById(TEST_OWNER_ID)).willReturn(Optional.of(owner)); // Already uses constant
 	}
 
 	@Test
 	void testInitNewVisitForm() throws Exception {
-		mockMvc.perform(get("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID, TEST_PET_ID))
+		mockMvc.perform(get("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID.toString(), TEST_PET_ID.toString())) // Use UUID strings
 			.andExpect(status().isOk())
 			.andExpect(view().name("pets/createOrUpdateVisitForm"));
 	}
@@ -74,7 +80,7 @@ class VisitControllerTests {
 	@Test
 	void testProcessNewVisitFormSuccess() throws Exception {
 		mockMvc
-			.perform(post("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID, TEST_PET_ID)
+			.perform(post("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID.toString(), TEST_PET_ID.toString()) // Use UUID strings
 				.param("name", "George")
 				.param("description", "Visit Description"))
 			.andExpect(status().is3xxRedirection())
@@ -84,8 +90,8 @@ class VisitControllerTests {
 	@Test
 	void testProcessNewVisitFormHasErrors() throws Exception {
 		mockMvc
-			.perform(post("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID, TEST_PET_ID).param("name",
-					"George"))
+			.perform(post("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID.toString(), TEST_PET_ID.toString()) // Use UUID strings
+				.param("name", "George"))
 			.andExpect(model().attributeHasErrors("visit"))
 			.andExpect(status().isOk())
 			.andExpect(view().name("pets/createOrUpdateVisitForm"));

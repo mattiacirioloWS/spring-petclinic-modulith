@@ -15,6 +15,7 @@
  */
 package org.springframework.samples.petclinic.vet;
 
+import java.util.UUID; // Added import
 import org.junit.jupiter.api.Test;
 import org.springframework.util.SerializationUtils;
 
@@ -30,7 +31,8 @@ class VetTests {
 		Vet vet = new Vet();
 		vet.setFirstName("Zaphod");
 		vet.setLastName("Beeblebrox");
-		vet.setId(123);
+		UUID id = UUID.randomUUID(); // Use UUID
+		vet.setId(id);
 		@SuppressWarnings("deprecation")
 		Vet other = (Vet) SerializationUtils.deserialize(SerializationUtils.serialize(vet));
 		assertThat(other.getFirstName()).isEqualTo(vet.getFirstName());

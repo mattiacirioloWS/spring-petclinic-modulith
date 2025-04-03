@@ -17,10 +17,14 @@ package org.springframework.samples.petclinic.model;
 
 import java.io.Serializable;
 
+import java.util.UUID;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
 
 /**
  * Simple JavaBean domain object with an id property. Used as a base class for objects
@@ -33,19 +37,43 @@ import jakarta.persistence.MappedSuperclass;
 public class BaseEntity implements Serializable {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(columnDefinition = "UUID")
+	private UUID id;
 
-	public Integer getId() {
+	public UUID getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(UUID id) {
 		this.id = id;
 	}
 
+	@PrePersist
+	public void prePersist() {
+		if (this.id == null) {
+			this.id = UUID.randomUUID();
+		}
+	}
+
+	// isNew() remains the same, checking for null id
 	public boolean isNew() {
 		return this.id == null;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		BaseEntity that = (BaseEntity) o;
+
+		return id != null ? id.equals(that.id) : that.id == null;
+	}
+
+	@Override
+	public int hashCode() {
+		return id != null ? id.hashCode() : 0;
 	}
 
 }

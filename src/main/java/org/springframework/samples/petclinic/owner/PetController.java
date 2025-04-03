@@ -18,6 +18,7 @@ package org.springframework.samples.petclinic.owner;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.UUID; // Added import
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -58,25 +59,28 @@ class PetController {
 	}
 
 	@ModelAttribute("owner")
-	public Owner findOwner(@PathVariable("ownerId") int ownerId) {
-		Optional<Owner> optionalOwner = this.owners.findById(ownerId);
-		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
-				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct "));
+	public Owner findOwner(@PathVariable("ownerId") UUID ownerId) {
+		Owner owner = this.owners.findById(ownerId)
+			.orElseThrow(() -> new IllegalArgumentException("Owner not found with id: " + ownerId));
 		return owner;
 	}
 
 	@ModelAttribute("pet")
-	public Pet findPet(@PathVariable("ownerId") int ownerId,
-			@PathVariable(name = "petId", required = false) Integer petId) {
+	public Pet findPet(@PathVariable("ownerId") UUID ownerId, // Changed ownerId type
+			@PathVariable(name = "petId", required = false) UUID petId) { // Changed petId type
 
 		if (petId == null) {
 			return new Pet();
 		}
 
-		Optional<Owner> optionalOwner = this.owners.findById(ownerId);
-		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
-				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct "));
-		return owner.getPet(petId);
+		// Owner is already fetched by findOwner method using UUID
+		Owner owner = findOwner(ownerId);
+		// Assuming Owner.getPet(UUID) exists or will be updated
+		Pet pet = owner.getPet(petId);
+		if (pet == null) {
+			throw new IllegalArgumentException("Pet not found with id: " + petId);
+		}
+		return pet;
 	}
 
 	@InitBinder("owner")

@@ -27,6 +27,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
+import java.util.UUID; // Added import
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.petclinic.vet.VetRepository;
@@ -65,8 +66,10 @@ class MySqlIntegrationTests {
 
 	@Test
 	void testOwnerDetails() {
+		// Use the UUID corresponding to owner George Franklin from data.sql
+		String ownerId = "30000000-0000-0000-0000-000000000001";
 		RestTemplate template = builder.rootUri("http://localhost:" + port).build();
-		ResponseEntity<String> result = template.exchange(RequestEntity.get("/owners/1").build(), String.class);
+		ResponseEntity<String> result = template.exchange(RequestEntity.get("/owners/" + ownerId).build(), String.class);
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
 

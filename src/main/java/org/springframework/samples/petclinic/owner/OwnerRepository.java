@@ -17,6 +17,7 @@ package org.springframework.samples.petclinic.owner;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID; // Added import
 
 import jakarta.annotation.Nonnull;
 import org.springframework.data.domain.Page;
@@ -36,7 +37,7 @@ import org.springframework.data.jpa.repository.Query;
  * @author Michael Isvy
  * @author Wick Dynex
  */
-public interface OwnerRepository extends JpaRepository<Owner, Integer> {
+public interface OwnerRepository extends JpaRepository<Owner, UUID> {
 
 	/**
 	 * Retrieve all {@link PetType}s from the data store.
@@ -67,7 +68,7 @@ public interface OwnerRepository extends JpaRepository<Owner, Integer> {
 	 * @throws IllegalArgumentException if the id is null (assuming null is not a valid
 	 * input for id)
 	 */
-	Optional<Owner> findById(@Nonnull Integer id);
+	Optional<Owner> findById(@Nonnull UUID id);
 
 	/**
 	 * Returns all the owners from data store

@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID; // Added import
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -86,8 +87,10 @@ public class PostgresIntegrationTests {
 
 	@Test
 	void testOwnerDetails() {
+		// Use the UUID corresponding to owner George Franklin from data.sql
+		String ownerId = "30000000-0000-0000-0000-000000000001";
 		RestTemplate template = builder.rootUri("http://localhost:" + port).build();
-		ResponseEntity<String> result = template.exchange(RequestEntity.get("/owners/1").build(), String.class);
+		ResponseEntity<String> result = template.exchange(RequestEntity.get("/owners/" + ownerId).build(), String.class);
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
 

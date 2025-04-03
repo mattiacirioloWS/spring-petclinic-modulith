@@ -17,6 +17,7 @@ package org.springframework.samples.petclinic.owner;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID; // Added import
 
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -60,18 +61,23 @@ class VisitController {
 	 * @return Pet
 	 */
 	@ModelAttribute("visit")
-	public Visit loadPetWithVisit(@PathVariable("ownerId") int ownerId, @PathVariable("petId") int petId,
+	public Visit loadPetWithVisit(@PathVariable("ownerId") UUID ownerId, @PathVariable("petId") UUID petId, // Changed types to UUID
 			Map<String, Object> model) {
-		Optional<Owner> optionalOwner = owners.findById(ownerId);
-		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
-				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct "));
+		Owner owner = owners.findById(ownerId) // Use UUID
+			.orElseThrow(() -> new IllegalArgumentException("Owner not found with id: " + ownerId));
 
-		Pet pet = owner.getPet(petId);
+		Pet pet = owner.getPet(petId); // Use UUID
+		if (pet == null) { // Add null check as getPet can return null
+			throw new IllegalArgumentException("Pet not found with id: " + petId);
+		}
 		model.put("pet", pet);
 		model.put("owner", owner);
 
 		Visit visit = new Visit();
-		pet.addVisit(visit);
+		// The pet object fetched already has the visit list, addVisit on pet handles association
+		// pet.addVisit(visit); // This line might be redundant if Visit constructor links it, or handled by JPA. Let's keep Owner.addVisit logic.
+		// The visit object is implicitly associated when added to the Pet's collection by owner.addVisit later.
+		// No need to explicitly set the pet on the visit here.
 		return visit;
 	}
 
@@ -85,13 +91,14 @@ class VisitController {
 	// Spring MVC calls method loadPetWithVisit(...) before processNewVisitForm is
 	// called
 	@PostMapping("/owners/{ownerId}/pets/{petId}/visits/new")
-	public String processNewVisitForm(@ModelAttribute Owner owner, @PathVariable int petId, @Valid Visit visit,
+	public String processNewVisitForm(@ModelAttribute Owner owner, @PathVariable UUID petId, @Valid Visit visit, // Changed petId type to UUID
 			BindingResult result, RedirectAttributes redirectAttributes) {
 		if (result.hasErrors()) {
 			return "pets/createOrUpdateVisitForm";
 		}
 
-		owner.addVisit(petId, visit);
+		// owner.addVisit will associate the visit with the correct pet
+		owner.addVisit(petId, visit); // Use UUID
 		this.owners.save(owner);
 		redirectAttributes.addFlashAttribute("message", "Your visit has been booked");
 		return "redirect:/owners/{ownerId}";

@@ -17,6 +17,7 @@ package org.springframework.samples.petclinic.owner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID; // Added import
 
 import org.springframework.core.style.ToStringCreator;
 import org.springframework.samples.petclinic.model.Person;
@@ -111,15 +112,14 @@ public class Owner extends Person {
 	/**
 	 * Return the Pet with the given id, or null if none found for this Owner.
 	 * @param id to test
-	 * @return the Pet with the given id, or null if no such Pet exists for this Owner
+	 * @return the Pet with the given id, or null if none found for this Owner
 	 */
-	public Pet getPet(Integer id) {
+	public Pet getPet(UUID id) { // Changed parameter type to UUID
+		// If looking for a specific non-null ID, isNew check is redundant.
 		for (Pet pet : getPets()) {
-			if (!pet.isNew()) {
-				Integer compId = pet.getId();
-				if (compId.equals(id)) {
-					return pet;
-				}
+			UUID compId = pet.getId();
+			if (compId != null && compId.equals(id)) {
+				return pet;
 			}
 		}
 		return null;
@@ -132,10 +132,14 @@ public class Owner extends Person {
 	 * @return the Pet with the given name, or null if no such Pet exists for this Owner
 	 */
 	public Pet getPet(String name, boolean ignoreNew) {
+		// Simplified logic: If looking by name, isNew status might not be the primary filter.
+		// The ignoreNew flag seems intended to differentiate between finding existing vs potentially new pets.
+		// Let's adjust the logic slightly based on typical usage.
+		name = name.toLowerCase();
 		for (Pet pet : getPets()) {
 			String compName = pet.getName();
-			if (compName != null && compName.equalsIgnoreCase(name)) {
-				if (!ignoreNew || !pet.isNew()) {
+			if (compName != null && compName.toLowerCase().equals(name)) {
+				if (!ignoreNew || !pet.isNew()) { // Keep the original check for now, maybe the issue is elsewhere
 					return pet;
 				}
 			}
@@ -160,12 +164,12 @@ public class Owner extends Person {
 	 * @param petId the identifier of the {@link Pet}, must not be {@literal null}.
 	 * @param visit the visit to add, must not be {@literal null}.
 	 */
-	public void addVisit(Integer petId, Visit visit) {
+	public void addVisit(UUID petId, Visit visit) { // Changed parameter type to UUID
 
 		Assert.notNull(petId, "Pet identifier must not be null!");
 		Assert.notNull(visit, "Visit must not be null!");
 
-		Pet pet = getPet(petId);
+		Pet pet = getPet(petId); // Call the updated getPet method
 
 		Assert.notNull(pet, "Invalid Pet identifier!");
 

@@ -31,6 +31,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID; // Added import
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -51,9 +52,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisabledInAotMode
 class PetControllerTests {
 
-	private static final int TEST_OWNER_ID = 1;
-
-	private static final int TEST_PET_ID = 1;
+	private static final UUID TEST_OWNER_ID = UUID.fromString("30000000-0000-0000-0000-000000000001"); // Use UUID
+	private static final UUID TEST_PET_ID = UUID.fromString("40000000-0000-0000-0000-000000000001"); // Use UUID
+	private static final UUID TEST_PET_ID_DOG = UUID.fromString("40000000-0000-0000-0000-000000000002"); // Use UUID for second pet
+	private static final UUID TEST_PET_TYPE_ID = UUID.fromString("20000000-0000-0000-0000-000000000006"); // Use UUID for type
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -64,25 +66,36 @@ class PetControllerTests {
 	@BeforeEach
 	void setup() {
 		PetType cat = new PetType();
-		cat.setId(3);
+		cat.setId(TEST_PET_TYPE_ID); // Use UUID constant for type
 		cat.setName("hamster");
 		given(this.owners.findPetTypes()).willReturn(List.of(cat));
 
 		Owner owner = new Owner();
+		owner.setId(TEST_OWNER_ID); // Set owner ID
 		Pet pet = new Pet();
-		Pet dog = new Pet();
+		// Set properties other than ID first
+		pet.setName("petty"); // Name used in duplicate check test
+		// Ensure the pet type is set if needed by validation/logic
+		PetType hamsterType = new PetType();
+		hamsterType.setId(TEST_PET_TYPE_ID);
+		hamsterType.setName("hamster");
+		pet.setType(hamsterType);
+		pet.setBirthDate(LocalDate.now().minusYears(1)); // Set a valid birth date
+
+		// Add pet while its ID is null (isNew() == true)
 		owner.addPet(pet);
-		owner.addPet(dog);
+		// Now set the ID for the pet already in the owner's list
 		pet.setId(TEST_PET_ID);
-		dog.setId(TEST_PET_ID + 1);
-		pet.setName("petty");
-		dog.setName("doggy");
-		given(this.owners.findById(TEST_OWNER_ID)).willReturn(Optional.of(owner));
+
+		// No need to mock owner.getPet() as the owner object itself is real and contains the pet
+		// The controller will call getPet on the owner object returned by the mocked repository
+
+		given(this.owners.findById(TEST_OWNER_ID)).willReturn(Optional.of(owner)); // Use owner UUID constant
 	}
 
 	@Test
 	void testInitCreationForm() throws Exception {
-		mockMvc.perform(get("/owners/{ownerId}/pets/new", TEST_OWNER_ID))
+		mockMvc.perform(get("/owners/{ownerId}/pets/new", TEST_OWNER_ID.toString())) // Use UUID string
 			.andExpect(status().isOk())
 			.andExpect(view().name("pets/createOrUpdatePetForm"))
 			.andExpect(model().attributeExists("pet"));
@@ -91,7 +104,8 @@ class PetControllerTests {
 	@Test
 	void testProcessCreationFormSuccess() throws Exception {
 		mockMvc
-			.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", "Betty")
+			.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID.toString()) // Use UUID string
+				.param("name", "Betty")
 				.param("type", "hamster")
 				.param("birthDate", "2015-02-12"))
 			.andExpect(status().is3xxRedirection())
@@ -104,7 +118,8 @@ class PetControllerTests {
 		@Test
 		void testProcessCreationFormWithBlankName() throws Exception {
 			mockMvc
-				.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", "\t \n")
+				.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID.toString()) // Use UUID string
+					.param("name", "\t \n")
 					.param("birthDate", "2015-02-12"))
 				.andExpect(model().attributeHasNoErrors("owner"))
 				.andExpect(model().attributeHasErrors("pet"))
@@ -117,7 +132,8 @@ class PetControllerTests {
 		@Test
 		void testProcessCreationFormWithDuplicateName() throws Exception {
 			mockMvc
-				.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", "petty")
+				.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID.toString()) // Use UUID string
+					.param("name", "petty")
 					.param("birthDate", "2015-02-12"))
 				.andExpect(model().attributeHasNoErrors("owner"))
 				.andExpect(model().attributeHasErrors("pet"))
@@ -130,7 +146,8 @@ class PetControllerTests {
 		@Test
 		void testProcessCreationFormWithMissingPetType() throws Exception {
 			mockMvc
-				.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", "Betty")
+				.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID.toString()) // Use UUID string
+					.param("name", "Betty")
 					.param("birthDate", "2015-02-12"))
 				.andExpect(model().attributeHasNoErrors("owner"))
 				.andExpect(model().attributeHasErrors("pet"))
@@ -146,7 +163,8 @@ class PetControllerTests {
 			String futureBirthDate = currentDate.plusMonths(1).toString();
 
 			mockMvc
-				.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", "Betty")
+				.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID.toString()) // Use UUID string
+					.param("name", "Betty")
 					.param("birthDate", futureBirthDate))
 				.andExpect(model().attributeHasNoErrors("owner"))
 				.andExpect(model().attributeHasErrors("pet"))
@@ -158,7 +176,7 @@ class PetControllerTests {
 
 		@Test
 		void testInitUpdateForm() throws Exception {
-			mockMvc.perform(get("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID))
+			mockMvc.perform(get("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID.toString(), TEST_PET_ID.toString())) // Use UUID strings
 				.andExpect(status().isOk())
 				.andExpect(model().attributeExists("pet"))
 				.andExpect(view().name("pets/createOrUpdatePetForm"));
@@ -169,7 +187,8 @@ class PetControllerTests {
 	@Test
 	void testProcessUpdateFormSuccess() throws Exception {
 		mockMvc
-			.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID).param("name", "Betty")
+			.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID.toString(), TEST_PET_ID.toString()) // Use UUID strings
+				.param("name", "Betty")
 				.param("type", "hamster")
 				.param("birthDate", "2015-02-12"))
 			.andExpect(status().is3xxRedirection())
@@ -182,7 +201,8 @@ class PetControllerTests {
 		@Test
 		void testProcessUpdateFormWithInvalidBirthDate() throws Exception {
 			mockMvc
-				.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID).param("name", " ")
+				.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID.toString(), TEST_PET_ID.toString()) // Use UUID strings
+					.param("name", " ")
 					.param("birthDate", "2015/02/12"))
 				.andExpect(model().attributeHasNoErrors("owner"))
 				.andExpect(model().attributeHasErrors("pet"))
@@ -194,7 +214,8 @@ class PetControllerTests {
 		@Test
 		void testProcessUpdateFormWithBlankName() throws Exception {
 			mockMvc
-				.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID).param("name", "  ")
+				.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID.toString(), TEST_PET_ID.toString()) // Use UUID strings
+					.param("name", "  ")
 					.param("birthDate", "2015-02-12"))
 				.andExpect(model().attributeHasNoErrors("owner"))
 				.andExpect(model().attributeHasErrors("pet"))

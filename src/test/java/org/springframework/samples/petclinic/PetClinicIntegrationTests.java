@@ -18,6 +18,7 @@ package org.springframework.samples.petclinic;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.UUID; // Added import
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -51,8 +52,10 @@ public class PetClinicIntegrationTests {
 
 	@Test
 	void testOwnerDetails() {
+		// Use the UUID corresponding to owner George Franklin from data.sql
+		String ownerId = "30000000-0000-0000-0000-000000000001";
 		RestTemplate template = builder.rootUri("http://localhost:" + port).build();
-		ResponseEntity<String> result = template.exchange(RequestEntity.get("/owners/1").build(), String.class);
+		ResponseEntity<String> result = template.exchange(RequestEntity.get("/owners/" + ownerId).build(), String.class);
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
 
