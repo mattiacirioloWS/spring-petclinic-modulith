@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.samples.petclinic.vet;
+package org.springframework.samples.petclinic.vet.infrastructure.persistence;
 
 import java.util.Comparator;
 import java.util.HashSet;
@@ -42,14 +42,14 @@ import jakarta.xml.bind.annotation.XmlElement;
  */
 @Entity
 @Table(name = "vets")
-public class Vet extends Person {
+public class VetEntity extends Person {
 
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "vet_specialties", joinColumns = @JoinColumn(name = "vet_id"),
 			inverseJoinColumns = @JoinColumn(name = "specialty_id"))
-	private Set<Specialty> specialties;
+	private Set<SpecialtyEntity> specialties;
 
-	protected Set<Specialty> getSpecialtiesInternal() {
+	protected Set<SpecialtyEntity> getSpecialtiesInternal() {
 		if (this.specialties == null) {
 			this.specialties = new HashSet<>();
 		}
@@ -57,7 +57,7 @@ public class Vet extends Person {
 	}
 
 	@XmlElement
-	public List<Specialty> getSpecialties() {
+	public List<SpecialtyEntity> getSpecialties() {
 		return getSpecialtiesInternal().stream()
 			.sorted(Comparator.comparing(NamedEntity::getName))
 			.collect(Collectors.toList());
@@ -67,7 +67,7 @@ public class Vet extends Person {
 		return getSpecialtiesInternal().size();
 	}
 
-	public void addSpecialty(Specialty specialty) {
+	public void addSpecialty(SpecialtyEntity specialty) {
 		getSpecialtiesInternal().add(specialty);
 	}
 

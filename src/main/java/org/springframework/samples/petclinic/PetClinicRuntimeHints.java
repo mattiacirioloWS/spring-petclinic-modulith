@@ -20,7 +20,12 @@ import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.RuntimeHintsRegistrar;
 import org.springframework.samples.petclinic.model.BaseEntity;
 import org.springframework.samples.petclinic.model.Person;
-import org.springframework.samples.petclinic.vet.Vet;
+import org.springframework.samples.petclinic.vet.infrastructure.persistence.VetEntity;
+import org.springframework.samples.petclinic.owner.Owner;
+import org.springframework.samples.petclinic.owner.Pet;
+import org.springframework.samples.petclinic.owner.PetType;
+import org.springframework.samples.petclinic.owner.Visit;
+import org.springframework.samples.petclinic.vet.infrastructure.persistence.SpecialtyEntity;
 
 public class PetClinicRuntimeHints implements RuntimeHintsRegistrar {
 
@@ -31,7 +36,7 @@ public class PetClinicRuntimeHints implements RuntimeHintsRegistrar {
 		hints.resources().registerPattern("mysql-default-conf");
 		hints.serialization().registerType(BaseEntity.class);
 		hints.serialization().registerType(Person.class);
-		hints.serialization().registerType(Vet.class);
+		hints.serialization().registerType(VetEntity.class);
 	}
 
 }

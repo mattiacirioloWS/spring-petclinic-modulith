@@ -43,7 +43,7 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.samples.petclinic.vet.VetRepository;
+import org.springframework.samples.petclinic.vet.infrastructure.persistence.JpaVetRepository;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.RestTemplate;
 import org.testcontainers.DockerClientFactory;
@@ -58,7 +58,7 @@ public class PostgresIntegrationTests {
 	int port;
 
 	@Autowired
-	private VetRepository vets;
+	private JpaVetRepository vets;
 
 	@Autowired
 	private RestTemplateBuilder builder;

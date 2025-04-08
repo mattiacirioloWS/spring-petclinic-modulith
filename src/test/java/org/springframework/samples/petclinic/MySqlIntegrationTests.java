@@ -18,6 +18,9 @@ package org.springframework.samples.petclinic;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Collection;
+import java.util.UUID;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledInNativeImage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +32,8 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.samples.petclinic.vet.VetRepository;
+import org.springframework.samples.petclinic.vet.infrastructure.persistence.JpaVetRepository;
+import org.springframework.samples.petclinic.vet.infrastructure.persistence.VetEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.aot.DisabledInAotMode;
 import org.springframework.web.client.RestTemplate;
@@ -52,7 +56,7 @@ class MySqlIntegrationTests {
 	int port;
 
 	@Autowired
-	private VetRepository vets;
+	private JpaVetRepository vets;
 
 	@Autowired
 	private RestTemplateBuilder builder;

@@ -21,6 +21,7 @@ import org.springframework.util.SerializationUtils;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.springframework.samples.petclinic.vet.infrastructure.persistence.VetEntity;
 
 /**
  * @author Dave Syer
@@ -29,12 +30,11 @@ class VetTests {
 
 	@Test
 	void testSerialization() {
-		Vet vet = new Vet();
+		VetEntity vet = new VetEntity();
 		vet.setFirstName("Zaphod");
 		vet.setLastName("Beeblebrox");
 		vet.setId(UUID.fromString("12312312-3123-1231-2312-312312312312"));
-		@SuppressWarnings("deprecation")
-		Vet other = (Vet) SerializationUtils.deserialize(SerializationUtils.serialize(vet));
+		VetEntity other = SerializationUtils.clone(vet);
 		assertThat(other.getFirstName()).isEqualTo(vet.getFirstName());
 		assertThat(other.getLastName()).isEqualTo(vet.getLastName());
 		assertThat(other.getId()).isEqualTo(vet.getId());

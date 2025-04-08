@@ -35,8 +35,9 @@ import org.springframework.samples.petclinic.owner.OwnerRepository;
 import org.springframework.samples.petclinic.owner.Pet;
 import org.springframework.samples.petclinic.owner.PetType;
 import org.springframework.samples.petclinic.owner.Visit;
-import org.springframework.samples.petclinic.vet.Vet;
-import org.springframework.samples.petclinic.vet.VetRepository;
+import org.springframework.samples.petclinic.vet.infrastructure.persistence.VetEntity;
+import org.springframework.samples.petclinic.vet.infrastructure.persistence.SpecialtyEntity;
+import org.springframework.samples.petclinic.vet.infrastructure.persistence.JpaVetRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -77,7 +78,7 @@ class ClinicServiceTests {
 	protected OwnerRepository owners;
 
 	@Autowired
-	protected VetRepository vets;
+	protected JpaVetRepository vets;
 
 	Pageable pageable;
 
@@ -202,9 +203,10 @@ class ClinicServiceTests {
 
 	@Test
 	void shouldFindVets() {
-		Collection<Vet> vets = this.vets.findAll();
+		Collection<VetEntity> vets = this.vets.findAll();
 
-		Vet vet = EntityUtils.getById(vets, Vet.class, UUID.fromString("33333333-3333-3333-3333-333333333333"));
+		VetEntity vet = EntityUtils.getById(vets, VetEntity.class,
+				UUID.fromString("33333333-3333-3333-3333-333333333333"));
 		assertThat(vet.getLastName()).isEqualTo("Douglas");
 		assertThat(vet.getNrOfSpecialties()).isEqualTo(2);
 		assertThat(vet.getSpecialties().get(0).getName()).isEqualTo("dentistry");

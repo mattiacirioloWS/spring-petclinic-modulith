@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.samples.petclinic.vet;
+package org.springframework.samples.petclinic.vet.infrastructure.persistence;
 
 import org.springframework.samples.petclinic.model.NamedEntity;
 
@@ -21,12 +21,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 /**
- * Models a {@link Vet Vet's} specialty (for example, dentistry).
+ * Models a {@link VetEntity Vet's} specialty (for example, dentistry).
  *
  * @author Juergen Hoeller
  */
 @Entity
 @Table(name = "specialties")
-public class Specialty extends NamedEntity {
+public class SpecialtyEntity extends NamedEntity {
 
 }

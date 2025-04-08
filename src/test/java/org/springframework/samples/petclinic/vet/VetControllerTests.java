@@ -30,6 +30,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.samples.petclinic.vet.infrastructure.persistence.JpaVetRepository;
+import org.springframework.samples.petclinic.vet.infrastructure.persistence.VetEntity;
+import org.springframework.samples.petclinic.vet.infrastructure.persistence.SpecialtyEntity;
 
 import java.util.UUID;
 
@@ -51,22 +54,22 @@ class VetControllerTests {
 	private MockMvc mockMvc;
 
 	@MockitoBean
-	private VetRepository vets;
+	private JpaVetRepository vets;
 
-	private Vet james() {
-		Vet james = new Vet();
+	private VetEntity james() {
+		VetEntity james = new VetEntity();
 		james.setFirstName("James");
 		james.setLastName("Carter");
 		james.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
 		return james;
 	}
 
-	private Vet helen() {
-		Vet helen = new Vet();
+	private VetEntity helen() {
+		VetEntity helen = new VetEntity();
 		helen.setFirstName("Helen");
 		helen.setLastName("Leary");
 		helen.setId(UUID.fromString("22222222-2222-2222-2222-222222222222"));
-		Specialty radiology = new Specialty();
+		SpecialtyEntity radiology = new SpecialtyEntity();
 		radiology.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
 		radiology.setName("radiology");
 		helen.addSpecialty(radiology);
@@ -77,7 +80,7 @@ class VetControllerTests {
 	void setup() {
 		given(this.vets.findAll()).willReturn(Lists.newArrayList(james(), helen()));
 		given(this.vets.findAll(any(Pageable.class)))
-			.willReturn(new PageImpl<Vet>(Lists.newArrayList(james(), helen())));
+			.willReturn(new PageImpl<VetEntity>(Lists.newArrayList(james(), helen())));
 
 	}
 
