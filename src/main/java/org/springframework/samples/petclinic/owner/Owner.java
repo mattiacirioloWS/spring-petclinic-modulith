@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.core.style.ToStringCreator;
-import org.springframework.samples.petclinic.model.Person;
+import org.springframework.samples.petclinic.common.infrastructure.persistence.Person;
 import org.springframework.util.Assert;
 
 import jakarta.persistence.CascadeType;

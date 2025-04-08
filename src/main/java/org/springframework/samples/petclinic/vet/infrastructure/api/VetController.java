@@ -13,20 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.samples.petclinic.vet;
-
-import java.util.List;
+package org.springframework.samples.petclinic.vet.infrastructure.api;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.samples.petclinic.vet.application.VetDto;
+import org.springframework.samples.petclinic.vet.application.query.FindAllVets;
+import org.springframework.samples.petclinic.vet.application.query.FindVetsPage;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.samples.petclinic.vet.infrastructure.persistence.JpaVetRepository;
-import org.springframework.samples.petclinic.vet.infrastructure.persistence.VetEntity;
+
+import java.util.List;
 
 /**
  * @author Juergen Hoeller
@@ -37,10 +36,13 @@ import org.springframework.samples.petclinic.vet.infrastructure.persistence.VetE
 @Controller
 class VetController {
 
-	private final JpaVetRepository vetRepository;
+	private final FindAllVets findAllVets;
 
-	public VetController(JpaVetRepository vetRepository) {
-		this.vetRepository = vetRepository;
+	private final FindVetsPage findVetsPage;
+
+	public VetController(FindAllVets findAllVets, FindVetsPage findVetsPage) {
+		this.findAllVets = findAllVets;
+		this.findVetsPage = findVetsPage;
 	}
 
 	@GetMapping("/vets.html")
@@ -49,13 +51,13 @@ class VetController {
 		// VetEntity
 		// objects so it is simpler for Object-Xml mapping
 		Vets vets = new Vets();
-		Page<VetEntity> paginated = findPaginated(page);
+		Page<VetDto> paginated = findPaginated(page);
 		vets.getVetList().addAll(paginated.toList());
 		return addPaginationModel(page, paginated, model);
 	}
 
-	private String addPaginationModel(int page, Page<VetEntity> paginated, Model model) {
-		List<VetEntity> listVets = paginated.getContent();
+	private String addPaginationModel(int page, Page<VetDto> paginated, Model model) {
+		List<VetDto> listVets = paginated.getContent();
 		model.addAttribute("currentPage", page);
 		model.addAttribute("totalPages", paginated.getTotalPages());
 		model.addAttribute("totalItems", paginated.getTotalElements());
@@ -63,10 +65,8 @@ class VetController {
 		return "vets/vetList";
 	}
 
-	private Page<VetEntity> findPaginated(int page) {
-		int pageSize = 5;
-		Pageable pageable = PageRequest.of(page - 1, pageSize);
-		return vetRepository.findAll(pageable);
+	private Page<VetDto> findPaginated(int page) {
+		return findVetsPage.execute(page, 5);
 	}
 
 	@GetMapping({ "/vets" })
@@ -75,7 +75,7 @@ class VetController {
 		// VetEntity
 		// objects so it is simpler for JSon/Object mapping
 		Vets vets = new Vets();
-		vets.getVetList().addAll(this.vetRepository.findAll());
+		vets.getVetList().addAll(findAllVets.execute());
 		return vets;
 	}
 

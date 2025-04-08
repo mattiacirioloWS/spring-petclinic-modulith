@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.samples.petclinic.model.NamedEntity;
-import org.springframework.samples.petclinic.model.Person;
+import org.springframework.samples.petclinic.common.infrastructure.persistence.NamedEntity;
+import org.springframework.samples.petclinic.common.infrastructure.persistence.Person;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -56,7 +56,6 @@ public class VetEntity extends Person {
 		return this.specialties;
 	}
 
-	@XmlElement
 	public List<SpecialtyEntity> getSpecialties() {
 		return getSpecialtiesInternal().stream()
 			.sorted(Comparator.comparing(NamedEntity::getName))
@@ -65,10 +64,6 @@ public class VetEntity extends Person {
 
 	public int getNrOfSpecialties() {
 		return getSpecialtiesInternal().size();
-	}
-
-	public void addSpecialty(SpecialtyEntity specialty) {
-		getSpecialtiesInternal().add(specialty);
 	}
 
 }

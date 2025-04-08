@@ -19,10 +19,12 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -36,7 +38,7 @@ import java.util.UUID;
  * @author Sam Brannen
  * @author Michael Isvy
  */
-public interface JpaVetRepository extends Repository<VetEntity, UUID> {
+public interface JpaVetRepository extends JpaRepository<VetEntity, UUID> {
 
 	/**
 	 * Retrieve all <code>VetEntity</code>s from the data store.
@@ -44,7 +46,7 @@ public interface JpaVetRepository extends Repository<VetEntity, UUID> {
 	 */
 	@Transactional(readOnly = true)
 	@Cacheable("vets")
-	Collection<VetEntity> findAll() throws DataAccessException;
+	List<VetEntity> findAll() throws DataAccessException;
 
 	/**
 	 * Retrieve all <code>VetEntity</code>s from data store in Pages
@@ -55,5 +57,9 @@ public interface JpaVetRepository extends Repository<VetEntity, UUID> {
 	@Transactional(readOnly = true)
 	@Cacheable("vets")
 	Page<VetEntity> findAll(Pageable pageable) throws DataAccessException;
+
+	List<VetEntity> findBySpecialties_Name(String name);
+
+	Optional<VetEntity> findById(UUID id);
 
 }

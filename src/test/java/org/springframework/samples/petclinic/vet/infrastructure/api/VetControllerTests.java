@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-package org.springframework.samples.petclinic.vet;
+package org.springframework.samples.petclinic.vet.infrastructure.api;
 
-import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledInNativeImage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.samples.petclinic.vet.application.SpecialtyDto;
+import org.springframework.samples.petclinic.vet.application.VetDto;
+import org.springframework.samples.petclinic.vet.application.query.FindAllVets;
+import org.springframework.samples.petclinic.vet.application.query.FindVetsPage;
 import org.springframework.test.context.aot.DisabledInAotMode;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.samples.petclinic.vet.infrastructure.persistence.JpaVetRepository;
-import org.springframework.samples.petclinic.vet.infrastructure.persistence.VetEntity;
-import org.springframework.samples.petclinic.vet.infrastructure.persistence.SpecialtyEntity;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -54,44 +54,33 @@ class VetControllerTests {
 	private MockMvc mockMvc;
 
 	@MockitoBean
-	private JpaVetRepository vets;
+	private FindVetsPage findVetsPage;
 
-	private VetEntity james() {
-		VetEntity james = new VetEntity();
-		james.setFirstName("James");
-		james.setLastName("Carter");
-		james.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
-		return james;
+	@MockitoBean
+	private FindAllVets findAllVets;
+
+	private VetDto james() {
+		return new VetDto(UUID.fromString("11111111-1111-1111-1111-111111111111"), "James", "Carter", List.of());
 	}
 
-	private VetEntity helen() {
-		VetEntity helen = new VetEntity();
-		helen.setFirstName("Helen");
-		helen.setLastName("Leary");
-		helen.setId(UUID.fromString("22222222-2222-2222-2222-222222222222"));
-		SpecialtyEntity radiology = new SpecialtyEntity();
-		radiology.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
-		radiology.setName("radiology");
-		helen.addSpecialty(radiology);
-		return helen;
+	private VetDto helen() {
+		return new VetDto(UUID.fromString("22222222-2222-2222-2222-222222222222"), "Helen", "Leary",
+				List.of(new SpecialtyDto(UUID.fromString("11111111-1111-1111-1111-111111111111"), "radiology")));
 	}
 
 	@BeforeEach
 	void setup() {
-		given(this.vets.findAll()).willReturn(Lists.newArrayList(james(), helen()));
-		given(this.vets.findAll(any(Pageable.class)))
-			.willReturn(new PageImpl<VetEntity>(Lists.newArrayList(james(), helen())));
-
+		given(this.findAllVets.execute()).willReturn(List.of(james(), helen()));
+		given(this.findVetsPage.execute(any(Integer.class), any(Integer.class)))
+			.willReturn(new PageImpl<>(List.of(james(), helen())));
 	}
 
 	@Test
 	void testShowVetListHtml() throws Exception {
-
 		mockMvc.perform(MockMvcRequestBuilders.get("/vets.html?page=1"))
 			.andExpect(status().isOk())
 			.andExpect(model().attributeExists("listVets"))
 			.andExpect(view().name("vets/vetList"));
-
 	}
 
 	@Test

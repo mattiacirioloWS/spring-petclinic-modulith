@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.samples.petclinic.vet;
+package org.springframework.samples.petclinic.vet.application;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.util.SerializationUtils;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.springframework.samples.petclinic.vet.infrastructure.persistence.VetEntity;
 
 /**
  * @author Dave Syer
@@ -30,14 +30,18 @@ class VetTests {
 
 	@Test
 	void testSerialization() {
-		VetEntity vet = new VetEntity();
-		vet.setFirstName("Zaphod");
-		vet.setLastName("Beeblebrox");
-		vet.setId(UUID.fromString("12312312-3123-1231-2312-312312312312"));
-		VetEntity other = SerializationUtils.clone(vet);
-		assertThat(other.getFirstName()).isEqualTo(vet.getFirstName());
-		assertThat(other.getLastName()).isEqualTo(vet.getLastName());
-		assertThat(other.getId()).isEqualTo(vet.getId());
+		VetDto vet = new VetDto(UUID.fromString("12312312-3123-1231-2312-312312312312"), "Zaphod", "Beeblebrox",
+				List.of(new SpecialtyDto(UUID.fromString("11111111-1111-1111-1111-111111111111"), "radiology")));
+
+		VetDto other = SerializationUtils.clone(vet);
+
+		assertThat(other.id()).isEqualTo(vet.id());
+		assertThat(other.firstName()).isEqualTo(vet.firstName());
+		assertThat(other.lastName()).isEqualTo(vet.lastName());
+		assertThat(other.specialties()).hasSize(1).first().satisfies(specialty -> {
+			assertThat(specialty.id()).isEqualTo(UUID.fromString("11111111-1111-1111-1111-111111111111"));
+			assertThat(specialty.name()).isEqualTo("radiology");
+		});
 	}
 
 }
