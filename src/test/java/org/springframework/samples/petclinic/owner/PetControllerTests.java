@@ -31,6 +31,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -51,9 +52,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisabledInAotMode
 class PetControllerTests {
 
-	private static final int TEST_OWNER_ID = 1;
+	private static final UUID TEST_OWNER_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
-	private static final int TEST_PET_ID = 1;
+	private static final UUID TEST_PET_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -64,7 +65,7 @@ class PetControllerTests {
 	@BeforeEach
 	void setup() {
 		PetType cat = new PetType();
-		cat.setId(3);
+		cat.setId(UUID.fromString("33333333-3333-3333-3333-333333333333"));
 		cat.setName("hamster");
 		given(this.owners.findPetTypes()).willReturn(List.of(cat));
 
@@ -74,7 +75,7 @@ class PetControllerTests {
 		owner.addPet(pet);
 		owner.addPet(dog);
 		pet.setId(TEST_PET_ID);
-		dog.setId(TEST_PET_ID + 1);
+		dog.setId(UUID.fromString("22222222-2222-2222-2222-222222222222"));
 		pet.setName("petty");
 		dog.setName("doggy");
 		given(this.owners.findById(TEST_OWNER_ID)).willReturn(Optional.of(owner));

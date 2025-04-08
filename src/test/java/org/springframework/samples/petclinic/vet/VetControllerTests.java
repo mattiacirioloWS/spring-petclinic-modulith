@@ -31,6 +31,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.UUID;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -55,7 +57,7 @@ class VetControllerTests {
 		Vet james = new Vet();
 		james.setFirstName("James");
 		james.setLastName("Carter");
-		james.setId(1);
+		james.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
 		return james;
 	}
 
@@ -63,9 +65,9 @@ class VetControllerTests {
 		Vet helen = new Vet();
 		helen.setFirstName("Helen");
 		helen.setLastName("Leary");
-		helen.setId(2);
+		helen.setId(UUID.fromString("22222222-2222-2222-2222-222222222222"));
 		Specialty radiology = new Specialty();
-		radiology.setId(1);
+		radiology.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
 		radiology.setName("radiology");
 		helen.addSpecialty(radiology);
 		return helen;
@@ -94,7 +96,7 @@ class VetControllerTests {
 		ResultActions actions = mockMvc.perform(get("/vets").accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk());
 		actions.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-			.andExpect(jsonPath("$.vetList[0].id").value(1));
+			.andExpect(jsonPath("$.vetList[0].id").value("11111111-1111-1111-1111-111111111111"));
 	}
 
 }

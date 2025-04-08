@@ -33,6 +33,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Test class for {@link VisitController}
@@ -45,9 +46,9 @@ import java.util.Optional;
 @DisabledInAotMode
 class VisitControllerTests {
 
-	private static final int TEST_OWNER_ID = 1;
+	private static final UUID TEST_OWNER_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
-	private static final int TEST_PET_ID = 1;
+	private static final UUID TEST_PET_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
 	@Autowired
 	private MockMvc mockMvc;

@@ -32,6 +32,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThan;
@@ -60,7 +61,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisabledInAotMode
 class OwnerControllerTests {
 
-	private static final int TEST_OWNER_ID = 1;
+	private static final UUID TEST_OWNER_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -83,7 +84,7 @@ class OwnerControllerTests {
 		max.setName("Max");
 		max.setBirthDate(LocalDate.now());
 		george.addPet(max);
-		max.setId(1);
+		max.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
 		return george;
 	}
 
@@ -232,10 +233,10 @@ class OwnerControllerTests {
 
 	@Test
 	public void testProcessUpdateOwnerFormWithIdMismatch() throws Exception {
-		int pathOwnerId = 1;
+		UUID pathOwnerId = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
 		Owner owner = new Owner();
-		owner.setId(2);
+		owner.setId(UUID.fromString("22222222-2222-2222-2222-222222222222"));
 		owner.setFirstName("John");
 		owner.setLastName("Doe");
 		owner.setAddress("Center Street");
