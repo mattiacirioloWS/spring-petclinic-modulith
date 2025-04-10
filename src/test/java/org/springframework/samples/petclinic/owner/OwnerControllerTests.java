@@ -16,6 +16,7 @@
 
 package org.springframework.samples.petclinic.owner;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledInNativeImage;
@@ -24,6 +25,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.samples.petclinic.pet.Pet;
+import org.springframework.samples.petclinic.pet.PetRepository;
+import org.springframework.samples.petclinic.pet.PetType;
+import org.springframework.samples.petclinic.pet.Visit;
 import org.springframework.test.context.aot.DisabledInAotMode;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -69,6 +74,11 @@ class OwnerControllerTests {
 	@MockitoBean
 	private OwnerRepository owners;
 
+	@MockitoBean
+	private PetRepository pets;
+
+	private static final UUID maxId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+
 	private Owner george() {
 		Owner george = new Owner();
 		george.setId(TEST_OWNER_ID);
@@ -77,15 +87,23 @@ class OwnerControllerTests {
 		george.setAddress("110 W. Liberty St.");
 		george.setCity("Madison");
 		george.setTelephone("6085551023");
+		george.addPet(maxId);
+		return george;
+	}
+
+	private static Pet max() {
 		Pet max = new Pet();
+		max.setId(maxId);
 		PetType dog = new PetType();
 		dog.setName("dog");
 		max.setType(dog);
 		max.setName("Max");
 		max.setBirthDate(LocalDate.now());
-		george.addPet(max);
-		max.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
-		return george;
+
+		Visit visit = new Visit();
+		visit.setDate(LocalDate.now());
+		max.addVisit(visit);
+		return max;
 	}
 
 	@BeforeEach
@@ -98,9 +116,8 @@ class OwnerControllerTests {
 		given(this.owners.findAll(any(Pageable.class))).willReturn(new PageImpl<>(List.of(george)));
 
 		given(this.owners.findById(TEST_OWNER_ID)).willReturn(Optional.of(george));
-		Visit visit = new Visit();
-		visit.setDate(LocalDate.now());
-		george.getPet("Max").getVisits().add(visit);
+
+		given(this.pets.findByOwnerId(TEST_OWNER_ID)).willReturn(List.of(max()));
 
 	}
 
@@ -225,9 +242,9 @@ class OwnerControllerTests {
 			.andExpect(model().attribute("owner", hasProperty("address", is("110 W. Liberty St."))))
 			.andExpect(model().attribute("owner", hasProperty("city", is("Madison"))))
 			.andExpect(model().attribute("owner", hasProperty("telephone", is("6085551023"))))
-			.andExpect(model().attribute("owner", hasProperty("pets", not(empty()))))
-			.andExpect(model().attribute("owner",
-					hasProperty("pets", hasItem(hasProperty("visits", hasSize(greaterThan(0)))))))
+			.andExpect(model().attribute("owner", hasProperty("petIds", not(empty()))))
+			.andExpect(model().attribute("pets", not(empty())))
+			.andExpect(model().attribute("pets", hasItem(hasProperty("visits", hasSize(greaterThan(0))))))
 			.andExpect(view().name("owners/ownerDetails"));
 	}
 

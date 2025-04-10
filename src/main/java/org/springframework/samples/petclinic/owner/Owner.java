@@ -15,22 +15,15 @@
  */
 package org.springframework.samples.petclinic.owner;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
+import jakarta.persistence.*;
 import org.springframework.core.style.ToStringCreator;
 import org.springframework.samples.petclinic.common.infrastructure.persistence.Person;
+import org.springframework.samples.petclinic.pet.Pet;
+import org.springframework.samples.petclinic.pet.Visit;
 import org.springframework.util.Assert;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OrderBy;
-import jakarta.persistence.Table;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.NotBlank;
 
@@ -61,10 +54,11 @@ public class Owner extends Person {
 	@Pattern(regexp = "\\d{10}", message = "Telephone must be a 10-digit number")
 	private String telephone;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinColumn(name = "owner_id")
-	@OrderBy("name")
-	private final List<Pet> pets = new ArrayList<>();
+	// persist petIds as an inner collection (not relationship)
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "owner_pets", joinColumns = @JoinColumn(name = "id"))
+	@Column(name = "pet_id", nullable = false, unique = true)
+	private final Set<UUID> petIds = new HashSet<>();
 
 	public String getAddress() {
 		return this.address;
@@ -90,58 +84,12 @@ public class Owner extends Person {
 		this.telephone = telephone;
 	}
 
-	public List<Pet> getPets() {
-		return this.pets;
+	public Set<UUID> getPetIds() {
+		return this.petIds;
 	}
 
-	public void addPet(Pet pet) {
-		if (pet.isNew()) {
-			getPets().add(pet);
-		}
-	}
-
-	/**
-	 * Return the Pet with the given name, or null if none found for this Owner.
-	 * @param name to test
-	 * @return the Pet with the given name, or null if no such Pet exists for this Owner
-	 */
-	public Pet getPet(String name) {
-		return getPet(name, false);
-	}
-
-	/**
-	 * Return the Pet with the given id, or null if none found for this Owner.
-	 * @param id to test
-	 * @return the Pet with the given id, or null if no such Pet exists for this Owner
-	 */
-	public Pet getPet(UUID id) {
-		for (Pet pet : getPets()) {
-			if (!pet.isNew()) {
-				UUID compId = pet.getId();
-				if (compId.equals(id)) {
-					return pet;
-				}
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Return the Pet with the given name, or null if none found for this Owner.
-	 * @param name to test
-	 * @param ignoreNew whether to ignore new pets (pets that are not saved yet)
-	 * @return the Pet with the given name, or null if no such Pet exists for this Owner
-	 */
-	public Pet getPet(String name, boolean ignoreNew) {
-		for (Pet pet : getPets()) {
-			String compName = pet.getName();
-			if (compName != null && compName.equalsIgnoreCase(name)) {
-				if (!ignoreNew || !pet.isNew()) {
-					return pet;
-				}
-			}
-		}
-		return null;
+	public void addPet(UUID petId) {
+		petIds.add(petId);
 	}
 
 	@Override
@@ -154,23 +102,6 @@ public class Owner extends Person {
 			.append("city", this.city)
 			.append("telephone", this.telephone)
 			.toString();
-	}
-
-	/**
-	 * Adds the given {@link Visit} to the {@link Pet} with the given identifier.
-	 * @param petId the identifier of the {@link Pet}, must not be {@literal null}.
-	 * @param visit the visit to add, must not be {@literal null}.
-	 */
-	public void addVisit(UUID petId, Visit visit) {
-
-		Assert.notNull(petId, "Pet identifier must not be null!");
-		Assert.notNull(visit, "Visit must not be null!");
-
-		Pet pet = getPet(petId);
-
-		Assert.notNull(pet, "Invalid Pet identifier!");
-
-		pet.addVisit(visit);
 	}
 
 }

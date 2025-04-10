@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.samples.petclinic.owner;
+package org.springframework.samples.petclinic.pet;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.samples.petclinic.owner.Owner;
+import org.springframework.samples.petclinic.owner.OwnerRepository;
 import org.springframework.test.context.aot.DisabledInAotMode;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -56,29 +58,44 @@ class PetControllerTests {
 
 	private static final UUID TEST_PET_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
+	private static final UUID OTHER_PET_ID = UUID.fromString("22222222-2222-2222-2222-222222222222");
+
 	@Autowired
 	private MockMvc mockMvc;
 
 	@MockitoBean
 	private OwnerRepository owners;
 
+	@MockitoBean
+	private PetRepository pets;
+
+	@MockitoBean
+	private ClinicService clinicService;
+
 	@BeforeEach
 	void setup() {
-		PetType cat = new PetType();
-		cat.setId(UUID.fromString("33333333-3333-3333-3333-333333333333"));
-		cat.setName("hamster");
-		given(this.owners.findPetTypes()).willReturn(List.of(cat));
+		PetType hamster = new PetType();
+		hamster.setId(UUID.fromString("33333333-3333-3333-3333-333333333333"));
+		hamster.setName("hamster");
+		given(this.clinicService.findPetTypes()).willReturn(List.of(hamster));
+		given(pets.findPetTypes()).willReturn(List.of(hamster));
 
 		Owner owner = new Owner();
+		owner.setId(TEST_OWNER_ID);
 		Pet pet = new Pet();
-		Pet dog = new Pet();
-		owner.addPet(pet);
-		owner.addPet(dog);
 		pet.setId(TEST_PET_ID);
-		dog.setId(UUID.fromString("22222222-2222-2222-2222-222222222222"));
 		pet.setName("petty");
+		pet.setOwnerId(TEST_OWNER_ID);
+
+		Pet dog = new Pet();
+		dog.setId(OTHER_PET_ID);
 		dog.setName("doggy");
-		given(this.owners.findById(TEST_OWNER_ID)).willReturn(Optional.of(owner));
+		pet.setOwnerId(TEST_OWNER_ID);
+
+		given(clinicService.findOwnerById(TEST_OWNER_ID)).willReturn(Optional.of(owner));
+		given(clinicService.findPetsByOwnerId(TEST_OWNER_ID)).willReturn(List.of(pet, dog));
+		given(clinicService.findByIdAndOwnerId(TEST_PET_ID, TEST_OWNER_ID)).willReturn(Optional.of(pet));
+		given(clinicService.existsByNameAndOwnerId("petty", TEST_OWNER_ID)).willReturn(true);
 	}
 
 	@Test
@@ -107,7 +124,6 @@ class PetControllerTests {
 			mockMvc
 				.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", "\t \n")
 					.param("birthDate", "2015-02-12"))
-				.andExpect(model().attributeHasNoErrors("owner"))
 				.andExpect(model().attributeHasErrors("pet"))
 				.andExpect(model().attributeHasFieldErrors("pet", "name"))
 				.andExpect(model().attributeHasFieldErrorCode("pet", "name", "required"))
@@ -120,7 +136,6 @@ class PetControllerTests {
 			mockMvc
 				.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", "petty")
 					.param("birthDate", "2015-02-12"))
-				.andExpect(model().attributeHasNoErrors("owner"))
 				.andExpect(model().attributeHasErrors("pet"))
 				.andExpect(model().attributeHasFieldErrors("pet", "name"))
 				.andExpect(model().attributeHasFieldErrorCode("pet", "name", "duplicate"))
@@ -133,7 +148,6 @@ class PetControllerTests {
 			mockMvc
 				.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", "Betty")
 					.param("birthDate", "2015-02-12"))
-				.andExpect(model().attributeHasNoErrors("owner"))
 				.andExpect(model().attributeHasErrors("pet"))
 				.andExpect(model().attributeHasFieldErrors("pet", "type"))
 				.andExpect(model().attributeHasFieldErrorCode("pet", "type", "required"))
@@ -149,7 +163,6 @@ class PetControllerTests {
 			mockMvc
 				.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", "Betty")
 					.param("birthDate", futureBirthDate))
-				.andExpect(model().attributeHasNoErrors("owner"))
 				.andExpect(model().attributeHasErrors("pet"))
 				.andExpect(model().attributeHasFieldErrors("pet", "birthDate"))
 				.andExpect(model().attributeHasFieldErrorCode("pet", "birthDate", "typeMismatch.birthDate"))
@@ -185,7 +198,6 @@ class PetControllerTests {
 			mockMvc
 				.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID).param("name", " ")
 					.param("birthDate", "2015/02/12"))
-				.andExpect(model().attributeHasNoErrors("owner"))
 				.andExpect(model().attributeHasErrors("pet"))
 				.andExpect(model().attributeHasFieldErrors("pet", "birthDate"))
 				.andExpect(model().attributeHasFieldErrorCode("pet", "birthDate", "typeMismatch"))
@@ -197,7 +209,6 @@ class PetControllerTests {
 			mockMvc
 				.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID).param("name", "  ")
 					.param("birthDate", "2015-02-12"))
-				.andExpect(model().attributeHasNoErrors("owner"))
 				.andExpect(model().attributeHasErrors("pet"))
 				.andExpect(model().attributeHasFieldErrors("pet", "name"))
 				.andExpect(model().attributeHasFieldErrorCode("pet", "name", "required"))

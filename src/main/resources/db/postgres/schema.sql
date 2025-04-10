@@ -38,10 +38,14 @@ CREATE TABLE IF NOT EXISTS pets (
   name       TEXT,
   birth_date DATE,
   type_id    UUID NOT NULL REFERENCES types (id),
-  owner_id   UUID REFERENCES owners (id)
+  owner_id   UUID NOT NULL
 );
 CREATE INDEX ON pets (name);
-CREATE INDEX ON pets (owner_id);
+
+CREATE TABLE IF NOT EXISTS owner_pets (
+  id     UUID NOT NULL REFERENCES owners (id),
+  pet_id UUID NOT NULL UNIQUE REFERENCES pets (id)
+);
 
 CREATE TABLE IF NOT EXISTS visits (
   id          UUID PRIMARY KEY,

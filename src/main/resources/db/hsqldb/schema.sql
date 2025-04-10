@@ -2,6 +2,7 @@ DROP TABLE vet_specialties IF EXISTS;
 DROP TABLE vets IF EXISTS;
 DROP TABLE specialties IF EXISTS;
 DROP TABLE visits IF EXISTS;
+DROP TABLE owner_pets IF EXISTS;
 DROP TABLE pets IF EXISTS;
 DROP TABLE types IF EXISTS;
 DROP TABLE owners IF EXISTS;
@@ -48,11 +49,17 @@ CREATE TABLE pets (
   name       VARCHAR(30),
   birth_date DATE,
   type_id    UUID NOT NULL,
-  owner_id   UUID
+  owner_id   UUID NOT NULL
 );
-ALTER TABLE pets ADD CONSTRAINT fk_pets_owners FOREIGN KEY (owner_id) REFERENCES owners (id);
 ALTER TABLE pets ADD CONSTRAINT fk_pets_types FOREIGN KEY (type_id) REFERENCES types (id);
 CREATE INDEX pets_name ON pets (name);
+
+CREATE TABLE owner_pets (
+  id     UUID NOT NULL,
+  pet_id UUID NOT NULL UNIQUE
+);
+ALTER TABLE owner_pets ADD CONSTRAINT fk_owner_pets_owners FOREIGN KEY (id) REFERENCES owners (id);
+ALTER TABLE owner_pets ADD CONSTRAINT fk_owner_pets_pets FOREIGN KEY (pet_id) REFERENCES pets (id);
 
 CREATE TABLE visits (
   id          UUID PRIMARY KEY,
