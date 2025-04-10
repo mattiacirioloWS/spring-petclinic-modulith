@@ -27,6 +27,6 @@ import jakarta.persistence.Table;
  */
 @Entity
 @Table(name = "specialties")
-public class SpecialtyEntity extends NamedEntity {
+class SpecialtyEntity extends NamedEntity {
 
 }

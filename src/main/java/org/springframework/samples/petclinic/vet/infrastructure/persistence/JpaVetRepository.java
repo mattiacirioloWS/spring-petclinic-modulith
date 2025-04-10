@@ -38,7 +38,7 @@ import java.util.UUID;
  * @author Sam Brannen
  * @author Michael Isvy
  */
-public interface JpaVetRepository extends JpaRepository<VetEntity, UUID> {
+interface JpaVetRepository extends JpaRepository<VetEntity, UUID> {
 
 	/**
 	 * Retrieve all <code>VetEntity</code>s from the data store.

@@ -14,43 +14,26 @@
  * limitations under the License.
  */
 
-package org.springframework.samples.petclinic;
+package org.springframework.samples.petclinic.vet.infrastructure.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Collection;
-import java.util.UUID;
-
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledInNativeImage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.samples.petclinic.PetClinicApplication;
 import org.springframework.samples.petclinic.vet.infrastructure.persistence.JpaVetRepository;
-import org.springframework.samples.petclinic.vet.infrastructure.persistence.VetEntity;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.aot.DisabledInAotMode;
 import org.springframework.web.client.RestTemplate;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("mysql")
-@Testcontainers(disabledWithoutDocker = true)
-@DisabledInNativeImage
-@DisabledInAotMode
-class MySqlIntegrationTests {
-
-	@ServiceConnection
-	@Container
-	static MySQLContainer<?> container = new MySQLContainer<>("mysql:9.1");
+public class PetClinicIntegrationTests {
 
 	@LocalServerPort
 	int port;
@@ -73,6 +56,10 @@ class MySqlIntegrationTests {
 		ResponseEntity<String> result = template
 			.exchange(RequestEntity.get("/owners/11111111-1111-1111-1111-111111111111").build(), String.class);
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+	}
+
+	public static void main(String[] args) {
+		SpringApplication.run(PetClinicApplication.class, args);
 	}
 
 }

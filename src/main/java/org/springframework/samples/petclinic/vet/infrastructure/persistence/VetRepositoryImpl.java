@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 @Repository
 @Transactional(readOnly = true)
-public class VetRepositoryImpl implements VetRepository {
+class VetRepositoryImpl implements VetRepository {
 
 	private final JpaVetRepository jpaVetRepository;
 

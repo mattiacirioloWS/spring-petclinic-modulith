@@ -29,8 +29,6 @@ import org.springframework.samples.petclinic.pet.Pet;
 import org.springframework.samples.petclinic.pet.PetRepository;
 import org.springframework.samples.petclinic.pet.PetType;
 import org.springframework.samples.petclinic.pet.Visit;
-import org.springframework.samples.petclinic.vet.infrastructure.persistence.JpaVetRepository;
-import org.springframework.samples.petclinic.vet.infrastructure.persistence.VetEntity;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
@@ -79,9 +77,6 @@ class ClinicRepositoriesTests {
 
 	@Autowired
 	protected PetRepository pets;
-
-	@Autowired
-	protected JpaVetRepository vets;
 
 	Pageable pageable;
 
@@ -156,18 +151,6 @@ class ClinicRepositoriesTests {
 		PetType petType4 = EntityUtils.getById(petTypes, PetType.class,
 				UUID.fromString("44444444-4444-4444-4444-444444444444"));
 		assertThat(petType4.getName()).isEqualTo("snake");
-	}
-
-	@Test
-	void shouldFindVets() {
-		Collection<VetEntity> vets = this.vets.findAll();
-
-		VetEntity vet = EntityUtils.getById(vets, VetEntity.class,
-				UUID.fromString("33333333-3333-3333-3333-333333333333"));
-		assertThat(vet.getLastName()).isEqualTo("Douglas");
-		assertThat(vet.getNrOfSpecialties()).isEqualTo(2);
-		assertThat(vet.getSpecialties().get(0).getName()).isEqualTo("dentistry");
-		assertThat(vet.getSpecialties().get(1).getName()).isEqualTo("surgery");
 	}
 
 	@Test
