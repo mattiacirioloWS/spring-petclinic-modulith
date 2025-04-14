@@ -15,13 +15,11 @@
  */
 package org.springframework.samples.petclinic.common.infrastructure.persistence;
 
-import java.io.Serializable;
-import java.util.UUID;
-
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
+
+import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * Simple JavaBean domain object with an id property. Used as a base class for objects
@@ -33,8 +31,15 @@ import jakarta.persistence.MappedSuperclass;
 @MappedSuperclass
 public class BaseEntity implements Serializable {
 
+	public BaseEntity() {
+	}
+
+	public BaseEntity(UUID id) {
+		this.id = id;
+	}
+
 	@Id
-	@GeneratedValue(strategy = GenerationType.UUID)
+	// @GeneratedValue(strategy = GenerationType.UUID)
 	private UUID id;
 
 	public UUID getId() {

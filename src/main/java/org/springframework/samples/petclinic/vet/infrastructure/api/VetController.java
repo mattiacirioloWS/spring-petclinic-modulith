@@ -48,8 +48,7 @@ class VetController {
 	@GetMapping("/vets.html")
 	public String showVetList(@RequestParam(defaultValue = "1") int page, Model model) {
 		// Here we are returning an object of type 'Vets' rather than a collection of
-		// VetEntity
-		// objects so it is simpler for Object-Xml mapping
+		// VetEntity objects so it is simpler for Object-Xml mapping
 		Vets vets = new Vets();
 		Page<VetDto> paginated = findPaginated(page);
 		vets.getVetList().addAll(paginated.toList());
@@ -72,8 +71,7 @@ class VetController {
 	@GetMapping({ "/vets" })
 	public @ResponseBody Vets showResourcesVetList() {
 		// Here we are returning an object of type 'Vets' rather than a collection of
-		// VetEntity
-		// objects so it is simpler for JSon/Object mapping
+		// VetEntity objects so it is simpler for JSon/Object mapping
 		Vets vets = new Vets();
 		vets.getVetList().addAll(findAllVets.execute());
 		return vets;

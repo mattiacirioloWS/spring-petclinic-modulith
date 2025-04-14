@@ -21,12 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.samples.petclinic.owner.Owner;
-import org.springframework.samples.petclinic.owner.OwnerRepository;
-import org.springframework.samples.petclinic.pet.ClinicService;
-import org.springframework.samples.petclinic.pet.Pet;
-import org.springframework.samples.petclinic.pet.PetRepository;
-import org.springframework.samples.petclinic.pet.PetType;
+import org.springframework.samples.petclinic.pet.application.ClinicService;
+import org.springframework.samples.petclinic.pet.infrastructure.persistence.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -71,10 +67,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ClinicServiceTests {
 
 	@Autowired
-	protected OwnerRepository owners;
+	protected JpaOwnerRepository owners;
 
 	@Autowired
-	protected PetRepository pets;
+	protected JpaPetRepository pets;
 
 	@Autowired
 	protected ClinicService clinicService;
@@ -86,50 +82,52 @@ class ClinicServiceTests {
 
 		int found = pets.findByOwnerId(ownerId).size();
 
-		Pet pet = new Pet();
-		pet.setName("bowser");
-		Collection<PetType> types = this.pets.findPetTypes();
-		pet.setType(EntityUtils.getById(types, PetType.class, UUID.fromString("22222222-2222-2222-2222-222222222222")));
-		pet.setBirthDate(LocalDate.now());
-		pet.setOwnerId(ownerId);
-		Pet savedPet = clinicService.savePet(pet);
+		PetEntity petEntity = new PetEntity();
+		petEntity.setName("bowser");
+		Collection<PetTypeEntity> types = this.pets.findPetTypes();
+		petEntity.setType(EntityUtils.getById(types, PetTypeEntity.class,
+				UUID.fromString("22222222-2222-2222-2222-222222222222")));
+		petEntity.setBirthDate(LocalDate.now());
+		petEntity.setOwnerId(ownerId);
+		PetEntity savedPetEntity = clinicService.savePet(petEntity);
 
-		Optional<Owner> optionalOwner = this.owners.findById(ownerId);
+		Optional<OwnerEntity> optionalOwner = this.owners.findById(ownerId);
 		assertThat(optionalOwner).isPresent();
-		Owner owner6 = optionalOwner.get();
-		assertThat(owner6.getPetIds()).hasSize(found + 1);
-		assertThat(owner6.getPetIds()).contains(savedPet.getId());
+		OwnerEntity ownerEntity6 = optionalOwner.get();
+		assertThat(ownerEntity6.getPetIds()).hasSize(found + 1);
+		assertThat(ownerEntity6.getPetIds()).contains(savedPetEntity.getId());
 		// checks that id has been generated
-		assertThat(savedPet.getId()).isNotNull();
+		assertThat(savedPetEntity.getId()).isNotNull();
 	}
 
 	@Test
 	@Transactional
 	void shouldUpdatePetName() {
-		Optional<Owner> optionalOwner = this.owners.findById(UUID.fromString("66666666-6666-6666-6666-666666666666"));
+		Optional<OwnerEntity> optionalOwner = this.owners
+			.findById(UUID.fromString("66666666-6666-6666-6666-666666666666"));
 		assertThat(optionalOwner).isPresent();
-		Owner owner6 = optionalOwner.get();
+		OwnerEntity ownerEntity6 = optionalOwner.get();
 
-		int found = owner6.getPetIds().size();
+		int found = ownerEntity6.getPetIds().size();
 
-		Optional<Pet> optionalPet7 = pets.findByIdAndOwnerId(UUID.fromString("77777777-7777-7777-7777-777777777777"),
-				owner6.getId());
+		Optional<PetEntity> optionalPet7 = pets
+			.findByIdAndOwnerId(UUID.fromString("77777777-7777-7777-7777-777777777777"), ownerEntity6.getId());
 		assertThat(optionalPet7).isPresent();
 
-		Pet pet7 = optionalPet7.get();
-		String oldName = pet7.getName();
+		PetEntity petEntity7 = optionalPet7.get();
+		String oldName = petEntity7.getName();
 
 		String newName = oldName + "X";
-		pet7.setName(newName);
+		petEntity7.setName(newName);
 
-		this.clinicService.savePet(pet7);
+		this.clinicService.savePet(petEntity7);
 
 		optionalOwner = this.owners.findById(UUID.fromString("66666666-6666-6666-6666-666666666666"));
 		assertThat(optionalOwner).isPresent();
-		owner6 = optionalOwner.get();
-		assertThat(owner6.getPetIds()).hasSize(found);
-		pet7 = clinicService.findByIdAndOwnerId(pet7.getId(), owner6.getId()).get();
-		assertThat(pet7.getName()).isEqualTo(newName);
+		ownerEntity6 = optionalOwner.get();
+		assertThat(ownerEntity6.getPetIds()).hasSize(found);
+		petEntity7 = clinicService.findByIdAndOwnerId(petEntity7.getId(), ownerEntity6.getId()).get();
+		assertThat(petEntity7.getName()).isEqualTo(newName);
 	}
 
 }

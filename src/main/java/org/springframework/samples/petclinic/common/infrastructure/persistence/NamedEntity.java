@@ -19,6 +19,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.UUID;
+
 /**
  * Simple JavaBean domain object adds a name property to <code>BaseEntity</code>. Used as
  * a base class for objects needing these properties.
@@ -29,6 +31,14 @@ import jakarta.validation.constraints.NotBlank;
  */
 @MappedSuperclass
 public class NamedEntity extends BaseEntity {
+
+	public NamedEntity() {
+	}
+
+	public NamedEntity(UUID id, String name) {
+		super(id);
+		this.name = name;
+	}
 
 	@Column(name = "name")
 	@NotBlank

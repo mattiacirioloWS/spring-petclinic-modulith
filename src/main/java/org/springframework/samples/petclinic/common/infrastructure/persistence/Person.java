@@ -19,6 +19,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.UUID;
+
 /**
  * Simple JavaBean domain object representing an person.
  *
@@ -34,6 +36,15 @@ public class Person extends BaseEntity {
 	@Column(name = "last_name")
 	@NotBlank
 	private String lastName;
+
+	public Person() {
+	}
+
+	public Person(UUID uuid, String firstName, String lastName) {
+		super(uuid);
+		this.firstName = firstName;
+		this.lastName = lastName;
+	}
 
 	public String getFirstName() {
 		return this.firstName;
