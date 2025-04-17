@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.samples.petclinic.vet;
+package org.springframework.samples.petclinic.ddd.vet.application;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.util.SerializationUtils;
@@ -29,12 +29,12 @@ class VetTests {
 
 	@Test
 	void testSerialization() {
-		Vet vet = new Vet();
+		VetDto vet = new VetDto();
 		vet.setFirstName("Zaphod");
 		vet.setLastName("Beeblebrox");
 		vet.setId(UUID.fromString("12312312-3123-1231-2312-312312312312"));
 		@SuppressWarnings("deprecation")
-		Vet other = (Vet) SerializationUtils.deserialize(SerializationUtils.serialize(vet));
+		VetDto other = (VetDto) SerializationUtils.deserialize(SerializationUtils.serialize(vet));
 		assertThat(other.getFirstName()).isEqualTo(vet.getFirstName());
 		assertThat(other.getLastName()).isEqualTo(vet.getLastName());
 		assertThat(other.getId()).isEqualTo(vet.getId());

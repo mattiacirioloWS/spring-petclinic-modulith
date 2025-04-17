@@ -15,25 +15,19 @@
  */
 package org.springframework.samples.petclinic.owner;
 
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.UUID;
-
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @author Juergen Hoeller
@@ -62,7 +56,7 @@ class PetController {
 	public Owner findOwner(@PathVariable("ownerId") UUID ownerId) {
 		Optional<Owner> optionalOwner = this.owners.findById(ownerId);
 		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
-				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct "));
+				"Owner not found with uuid: " + ownerId + ". Please ensure the ID is correct "));
 		return owner;
 	}
 
@@ -76,7 +70,7 @@ class PetController {
 
 		Optional<Owner> optionalOwner = this.owners.findById(ownerId);
 		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
-				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct "));
+				"Owner not found with uuid: " + ownerId + ". Please ensure the ID is correct "));
 		return owner.getPet(petId);
 	}
 

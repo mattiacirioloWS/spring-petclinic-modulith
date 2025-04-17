@@ -15,15 +15,15 @@
  */
 package org.springframework.samples.petclinic.owner;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 import jakarta.annotation.Nonnull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Repository class for <code>Owner</code> domain objects All method names are compliant
@@ -56,17 +56,17 @@ public interface OwnerRepository extends JpaRepository<Owner, UUID> {
 	Page<Owner> findByLastNameStartingWith(String lastName, Pageable pageable);
 
 	/**
-	 * Retrieve an {@link Owner} from the data store by id.
+	 * Retrieve an {@link Owner} from the data store by uuid.
 	 * <p>
 	 * This method returns an {@link Optional} containing the {@link Owner} if found. If
-	 * no {@link Owner} is found with the provided id, it will return an empty
+	 * no {@link Owner} is found with the provided uuid, it will return an empty
 	 * {@link Optional}.
 	 * </p>
-	 * @param id the id to search for
+	 * @param id the uuid to search for
 	 * @return an {@link Optional} containing the {@link Owner} if found, or an empty
 	 * {@link Optional} if not found.
-	 * @throws IllegalArgumentException if the id is null (assuming null is not a valid
-	 * input for id)
+	 * @throws IllegalArgumentException if the uuid is null (assuming null is not a valid
+	 * input for uuid)
 	 */
 	Optional<Owner> findById(@Nonnull UUID id);
 

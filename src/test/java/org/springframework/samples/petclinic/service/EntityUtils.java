@@ -34,10 +34,10 @@ import java.util.UUID;
 public abstract class EntityUtils {
 
 	/**
-	 * Look up the entity of the given class with the given id in the given collection.
+	 * Look up the entity of the given class with the given uuid in the given collection.
 	 * @param entities the collection to search
 	 * @param entityClass the entity class to look up
-	 * @param entityId the entity id to look up
+	 * @param entityId the entity uuid to look up
 	 * @return the found entity
 	 * @throws ObjectRetrievalFailureException if the entity was not found
 	 */

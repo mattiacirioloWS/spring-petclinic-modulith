@@ -16,13 +16,6 @@
 
 package org.springframework.samples.petclinic.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.UUID;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -30,14 +23,15 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.samples.petclinic.owner.Owner;
-import org.springframework.samples.petclinic.owner.OwnerRepository;
-import org.springframework.samples.petclinic.owner.Pet;
-import org.springframework.samples.petclinic.owner.PetType;
-import org.springframework.samples.petclinic.owner.Visit;
-import org.springframework.samples.petclinic.vet.Vet;
-import org.springframework.samples.petclinic.vet.VetRepository;
+import org.springframework.samples.petclinic.owner.*;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Integration test of the Service and the Repository layer.
@@ -75,9 +69,6 @@ class ClinicServiceTests {
 
 	@Autowired
 	protected OwnerRepository owners;
-
-	@Autowired
-	protected VetRepository vets;
 
 	Pageable pageable;
 
@@ -174,7 +165,7 @@ class ClinicServiceTests {
 		assertThat(optionalOwner).isPresent();
 		owner6 = optionalOwner.get();
 		assertThat(owner6.getPets()).hasSize(found + 1);
-		// checks that id has been generated
+		// checks that uuid has been generated
 		pet = owner6.getPet("bowser");
 		assertThat(pet.getId()).isNotNull();
 	}
@@ -198,17 +189,6 @@ class ClinicServiceTests {
 		owner6 = optionalOwner.get();
 		pet7 = owner6.getPet(UUID.fromString("77777777-7777-7777-7777-777777777777"));
 		assertThat(pet7.getName()).isEqualTo(newName);
-	}
-
-	@Test
-	void shouldFindVets() {
-		Collection<Vet> vets = this.vets.findAll();
-
-		Vet vet = EntityUtils.getById(vets, Vet.class, UUID.fromString("33333333-3333-3333-3333-333333333333"));
-		assertThat(vet.getLastName()).isEqualTo("Douglas");
-		assertThat(vet.getNrOfSpecialties()).isEqualTo(2);
-		assertThat(vet.getSpecialties().get(0).getName()).isEqualTo("dentistry");
-		assertThat(vet.getSpecialties().get(1).getName()).isEqualTo("surgery");
 	}
 
 	@Test

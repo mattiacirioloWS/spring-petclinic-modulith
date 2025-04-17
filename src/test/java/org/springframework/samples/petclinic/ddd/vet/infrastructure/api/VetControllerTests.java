@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.samples.petclinic.vet;
+package org.springframework.samples.petclinic.ddd.vet.infrastructure.api;
 
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,12 +25,16 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.samples.petclinic.ddd.vet.application.FindVets;
+import org.springframework.samples.petclinic.ddd.vet.application.SpecialtyDto;
+import org.springframework.samples.petclinic.ddd.vet.application.VetDto;
 import org.springframework.test.context.aot.DisabledInAotMode;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -51,33 +55,32 @@ class VetControllerTests {
 	private MockMvc mockMvc;
 
 	@MockitoBean
-	private VetRepository vets;
+	private FindVets vets;
 
-	private Vet james() {
-		Vet james = new Vet();
+	private VetDto james() {
+		VetDto james = new VetDto();
 		james.setFirstName("James");
 		james.setLastName("Carter");
 		james.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
 		return james;
 	}
 
-	private Vet helen() {
-		Vet helen = new Vet();
+	private VetDto helen() {
+		VetDto helen = new VetDto();
 		helen.setFirstName("Helen");
 		helen.setLastName("Leary");
 		helen.setId(UUID.fromString("22222222-2222-2222-2222-222222222222"));
-		Specialty radiology = new Specialty();
+		SpecialtyDto radiology = new SpecialtyDto();
 		radiology.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
 		radiology.setName("radiology");
-		helen.addSpecialty(radiology);
+		helen.setSpecialties(List.of(radiology));
 		return helen;
 	}
 
 	@BeforeEach
 	void setup() {
 		given(this.vets.findAll()).willReturn(Lists.newArrayList(james(), helen()));
-		given(this.vets.findAll(any(Pageable.class)))
-			.willReturn(new PageImpl<Vet>(Lists.newArrayList(james(), helen())));
+		given(this.vets.findAll(any(Pageable.class))).willReturn(new PageImpl<>(Lists.newArrayList(james(), helen())));
 
 	}
 
