@@ -1,7 +1,7 @@
 package org.springframework.samples.petclinic.ddd.vet.infrastructure.persistence;
 
 import jakarta.persistence.*;
-import org.springframework.samples.petclinic.ddd.common.domain.Name;
+import org.springframework.samples.petclinic.ddd.vet.domain.Name;
 import org.springframework.samples.petclinic.ddd.vet.domain.SpecialtyId;
 
 @Entity

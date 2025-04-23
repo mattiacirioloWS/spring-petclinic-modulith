@@ -1,7 +1,7 @@
 package org.springframework.samples.petclinic.ddd.vet.infrastructure.persistence;
 
 import jakarta.persistence.*;
-import org.springframework.samples.petclinic.ddd.common.domain.PersonName;
+import org.springframework.samples.petclinic.ddd.vet.domain.PersonName;
 import org.springframework.samples.petclinic.ddd.vet.domain.VetId;
 
 import java.util.Set;

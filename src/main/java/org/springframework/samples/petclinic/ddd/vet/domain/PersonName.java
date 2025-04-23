@@ -1,4 +1,4 @@
-package org.springframework.samples.petclinic.ddd.common.domain;
+package org.springframework.samples.petclinic.ddd.vet.domain;
 
 import org.jmolecules.ddd.annotation.ValueObject;
 

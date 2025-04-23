@@ -3,7 +3,6 @@ package org.springframework.samples.petclinic.ddd.vet.domain;
 import org.jmolecules.ddd.annotation.Entity;
 import org.jmolecules.ddd.annotation.Factory;
 import org.jmolecules.ddd.annotation.Identity;
-import org.springframework.samples.petclinic.ddd.common.domain.Name;
 
 @Entity
 public final class Specialty {
