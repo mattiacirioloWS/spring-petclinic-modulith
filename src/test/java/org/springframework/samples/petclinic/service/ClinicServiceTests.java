@@ -23,7 +23,9 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.samples.petclinic.owner.*;
+import org.springframework.samples.petclinic.ddd.owner.infrastructure.persistence.OwnerEntity;
+import org.springframework.samples.petclinic.ddd.owner.infrastructure.persistence.OwnerJpaRepository;
+import org.springframework.samples.petclinic.ddd.pet.infrastructure.persistence.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -68,13 +70,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ClinicServiceTests {
 
 	@Autowired
-	protected OwnerRepository owners;
+	protected OwnerJpaRepository owners;
 
 	Pageable pageable;
 
 	@Test
 	void shouldFindOwnersByLastName() {
-		Page<Owner> owners = this.owners.findByLastNameStartingWith("Davis", pageable);
+		Page<OwnerEntity> owners = this.owners.findByLastNameStartingWith("Davis", pageable);
 		assertThat(owners).hasSize(2);
 
 		owners = this.owners.findByLastNameStartingWith("Daviss", pageable);
@@ -83,9 +85,10 @@ class ClinicServiceTests {
 
 	@Test
 	void shouldFindSingleOwnerWithPet() {
-		Optional<Owner> optionalOwner = this.owners.findById(UUID.fromString("11111111-1111-1111-1111-111111111111"));
+		Optional<OwnerEntity> optionalOwner = this.owners
+			.findById(UUID.fromString("11111111-1111-1111-1111-111111111111"));
 		assertThat(optionalOwner).isPresent();
-		Owner owner = optionalOwner.get();
+		OwnerEntity owner = optionalOwner.get();
 		assertThat(owner.getLastName()).startsWith("Franklin");
 		assertThat(owner.getPets()).hasSize(1);
 		assertThat(owner.getPets().get(0).getType()).isNotNull();
@@ -95,10 +98,10 @@ class ClinicServiceTests {
 	@Test
 	@Transactional
 	void shouldInsertOwner() {
-		Page<Owner> owners = this.owners.findByLastNameStartingWith("Schultz", pageable);
+		Page<OwnerEntity> owners = this.owners.findByLastNameStartingWith("Schultz", pageable);
 		int found = (int) owners.getTotalElements();
 
-		Owner owner = new Owner();
+		OwnerEntity owner = new OwnerEntity();
 		owner.setFirstName("Sam");
 		owner.setLastName("Schultz");
 		owner.setAddress("4, Evans Street");
@@ -114,9 +117,10 @@ class ClinicServiceTests {
 	@Test
 	@Transactional
 	void shouldUpdateOwner() {
-		Optional<Owner> optionalOwner = this.owners.findById(UUID.fromString("11111111-1111-1111-1111-111111111111"));
+		Optional<OwnerEntity> optionalOwner = this.owners
+			.findById(UUID.fromString("11111111-1111-1111-1111-111111111111"));
 		assertThat(optionalOwner).isPresent();
-		Owner owner = optionalOwner.get();
+		OwnerEntity owner = optionalOwner.get();
 		String oldLastName = owner.getLastName();
 		String newLastName = oldLastName + "X";
 
@@ -132,12 +136,12 @@ class ClinicServiceTests {
 
 	@Test
 	void shouldFindAllPetTypes() {
-		Collection<PetType> petTypes = this.owners.findPetTypes();
+		Collection<PetTypeEntity> petTypes = this.owners.findPetTypes();
 
-		PetType petType1 = EntityUtils.getById(petTypes, PetType.class,
+		PetTypeEntity petType1 = EntityUtils.getById(petTypes, PetTypeEntity.class,
 				UUID.fromString("11111111-1111-1111-1111-111111111111"));
 		assertThat(petType1.getName()).isEqualTo("cat");
-		PetType petType4 = EntityUtils.getById(petTypes, PetType.class,
+		PetTypeEntity petType4 = EntityUtils.getById(petTypes, PetTypeEntity.class,
 				UUID.fromString("44444444-4444-4444-4444-444444444444"));
 		assertThat(petType4.getName()).isEqualTo("snake");
 	}
@@ -145,16 +149,18 @@ class ClinicServiceTests {
 	@Test
 	@Transactional
 	void shouldInsertPetIntoDatabaseAndGenerateId() {
-		Optional<Owner> optionalOwner = this.owners.findById(UUID.fromString("66666666-6666-6666-6666-666666666666"));
+		Optional<OwnerEntity> optionalOwner = this.owners
+			.findById(UUID.fromString("66666666-6666-6666-6666-666666666666"));
 		assertThat(optionalOwner).isPresent();
-		Owner owner6 = optionalOwner.get();
+		OwnerEntity owner6 = optionalOwner.get();
 
 		int found = owner6.getPets().size();
 
-		Pet pet = new Pet();
+		PetEntity pet = new PetEntity();
 		pet.setName("bowser");
-		Collection<PetType> types = this.owners.findPetTypes();
-		pet.setType(EntityUtils.getById(types, PetType.class, UUID.fromString("22222222-2222-2222-2222-222222222222")));
+		Collection<PetTypeEntity> types = this.owners.findPetTypes();
+		pet.setType(EntityUtils.getById(types, PetTypeEntity.class,
+				UUID.fromString("22222222-2222-2222-2222-222222222222")));
 		pet.setBirthDate(LocalDate.now());
 		owner6.addPet(pet);
 		assertThat(owner6.getPets()).hasSize(found + 1);
@@ -173,11 +179,12 @@ class ClinicServiceTests {
 	@Test
 	@Transactional
 	void shouldUpdatePetName() {
-		Optional<Owner> optionalOwner = this.owners.findById(UUID.fromString("66666666-6666-6666-6666-666666666666"));
+		Optional<OwnerEntity> optionalOwner = this.owners
+			.findById(UUID.fromString("66666666-6666-6666-6666-666666666666"));
 		assertThat(optionalOwner).isPresent();
-		Owner owner6 = optionalOwner.get();
+		OwnerEntity owner6 = optionalOwner.get();
 
-		Pet pet7 = owner6.getPet(UUID.fromString("77777777-7777-7777-7777-777777777777"));
+		PetEntity pet7 = owner6.getPet(UUID.fromString("77777777-7777-7777-7777-777777777777"));
 		String oldName = pet7.getName();
 
 		String newName = oldName + "X";
@@ -194,13 +201,14 @@ class ClinicServiceTests {
 	@Test
 	@Transactional
 	void shouldAddNewVisitForPet() {
-		Optional<Owner> optionalOwner = this.owners.findById(UUID.fromString("66666666-6666-6666-6666-666666666666"));
+		Optional<OwnerEntity> optionalOwner = this.owners
+			.findById(UUID.fromString("66666666-6666-6666-6666-666666666666"));
 		assertThat(optionalOwner).isPresent();
-		Owner owner6 = optionalOwner.get();
+		OwnerEntity owner6 = optionalOwner.get();
 
-		Pet pet7 = owner6.getPet(UUID.fromString("77777777-7777-7777-7777-777777777777"));
+		PetEntity pet7 = owner6.getPet(UUID.fromString("77777777-7777-7777-7777-777777777777"));
 		int found = pet7.getVisits().size();
-		Visit visit = new Visit();
+		VisitEntity visit = new VisitEntity();
 		visit.setDescription("test");
 
 		owner6.addVisit(pet7.getId(), visit);
@@ -213,17 +221,18 @@ class ClinicServiceTests {
 
 	@Test
 	void shouldFindVisitsByPetId() {
-		Optional<Owner> optionalOwner = this.owners.findById(UUID.fromString("66666666-6666-6666-6666-666666666666"));
+		Optional<OwnerEntity> optionalOwner = this.owners
+			.findById(UUID.fromString("66666666-6666-6666-6666-666666666666"));
 		assertThat(optionalOwner).isPresent();
-		Owner owner6 = optionalOwner.get();
+		OwnerEntity owner6 = optionalOwner.get();
 
-		Pet pet7 = owner6.getPet(UUID.fromString("77777777-7777-7777-7777-777777777777"));
-		Collection<Visit> visits = pet7.getVisits();
+		PetEntity pet7 = owner6.getPet(UUID.fromString("77777777-7777-7777-7777-777777777777"));
+		Collection<VisitEntity> visits = pet7.getVisits();
 
 		assertThat(visits) //
 			.hasSize(2) //
 			.element(0)
-			.extracting(Visit::getDate)
+			.extracting(VisitEntity::getDate)
 			.isNotNull();
 	}
 

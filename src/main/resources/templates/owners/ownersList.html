@@ -24,7 +24,7 @@
     <td th:text="${owner.address}"/>
     <td th:text="${owner.city}"/>
     <td th:text="${owner.telephone}"/>
-    <td><span th:text="${#strings.listJoin(owner.pets, ', ')}"/></td>
+    <td><span th:text="${#strings.listJoin(pets, ', ')}"/></td>
   </tr>
   </tbody>
 </table>
@@ -42,12 +42,12 @@
       <span th:unless="${currentPage > 1}" title="First" class="fa fa-fast-backward"></span>
     </span>
   <span>
-      <a th:if="${currentPage > 1}" th:href="@{'/owners?page=__${currentPage - 1}__'}" title="Previous"
+      <a th:if="${currentPage > 1}" th:href="@{/owners(page=${currentPage - 1}, ownerLastName=${param.ownerLastName})}" title="Previous"
          class="fa fa-step-backward"></a>
       <span th:unless="${currentPage > 1}" title="Previous" class="fa fa-step-backward"></span>
     </span>
   <span>
-      <a th:if="${currentPage < totalPages}" th:href="@{'/owners?page=__${currentPage + 1}__'}" title="Next"
+      <a th:if="${currentPage < totalPages}" th:href="@{/owners(page=${currentPage + 1}, ownerLastName=${param.ownerLastName})}" title="Next"
          class="fa fa-step-forward"></a>
       <span th:unless="${currentPage < totalPages}" title="Next" class="fa fa-step-forward"></span>
     </span>

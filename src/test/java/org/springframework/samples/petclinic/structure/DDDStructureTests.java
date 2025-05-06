@@ -4,6 +4,7 @@ import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaPackage;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.core.importer.ImportOption;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.MappedSuperclass;
 import org.jmolecules.archunit.JMoleculesDddRules;
@@ -35,7 +36,8 @@ public class DDDStructureTests {
 	private static final String PROJECT_PACKAGE = "org.springframework.samples.petclinic.ddd";
 
 	static Stream<String> boundedContexts() {
-		JavaClasses classes = new ClassFileImporter().importPackages(PROJECT_PACKAGE);
+		JavaClasses classes = new ClassFileImporter().withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+			.importPackages(PROJECT_PACKAGE);
 
 		Set<String> allPackageNames = classes.stream().map(JavaClass::getPackageName).collect(Collectors.toSet());
 
@@ -49,7 +51,8 @@ public class DDDStructureTests {
 
 	@Test
 	void checkAllClassesFollowDDDStructure() {
-		JavaClasses classes = new ClassFileImporter().importPackages(PROJECT_PACKAGE);
+		JavaClasses classes = new ClassFileImporter().withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+			.importPackages(PROJECT_PACKAGE);
 
 		JMoleculesDddRules.all().check(classes);
 	}
@@ -57,7 +60,8 @@ public class DDDStructureTests {
 	@ParameterizedTest
 	@MethodSource("boundedContexts")
 	void dddElementsShouldBeInCorrectLayers(String basePackage) {
-		JavaClasses classes = new ClassFileImporter().importPackages(basePackage);
+		JavaClasses classes = new ClassFileImporter().withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+			.importPackages(basePackage);
 
 		// Aggregates in Domain Layer
 		classes().that()
@@ -96,7 +100,8 @@ public class DDDStructureTests {
 	@ParameterizedTest
 	@MethodSource("boundedContexts")
 	void enforceSpringServiceAndComponentInApplicationLayer(String basePackage) {
-		JavaClasses classes = new ClassFileImporter().importPackages(basePackage);
+		JavaClasses classes = new ClassFileImporter().withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+			.importPackages(basePackage);
 
 		// Spring stereotypes in the correct layers
 		classes().that()
@@ -112,7 +117,8 @@ public class DDDStructureTests {
 	@ParameterizedTest
 	@MethodSource("boundedContexts")
 	void enforceSpringDataInInfrastructureLayerAndPersistencePackage(String basePackage) {
-		JavaClasses classes = new ClassFileImporter().importPackages(basePackage);
+		JavaClasses classes = new ClassFileImporter().withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+			.importPackages(basePackage);
 
 		// Spring Data classes in the correct layers
 		classes().that()
@@ -139,7 +145,8 @@ public class DDDStructureTests {
 	@ParameterizedTest
 	@MethodSource("boundedContexts")
 	void enforceSpringControllerInInfrastructureLayerAndApiPackage(String basePackage) {
-		JavaClasses classes = new ClassFileImporter().importPackages(basePackage);
+		JavaClasses classes = new ClassFileImporter().withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+			.importPackages(basePackage);
 
 		// Spring Controller classes in the correct layers
 		classes().that()
@@ -158,7 +165,8 @@ public class DDDStructureTests {
 	@ParameterizedTest
 	@MethodSource("boundedContexts")
 	void enforceLayeringDependencies(String basePackage) {
-		JavaClasses classes = new ClassFileImporter().importPackages(basePackage);
+		JavaClasses classes = new ClassFileImporter().withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+			.importPackages(basePackage);
 
 		// Domain should not depend on other layers
 		noClasses().that(areInDomainLayer(classes))
@@ -186,7 +194,8 @@ public class DDDStructureTests {
 
 	@Test
 	void enforceJMoleculesAndSpringStereotypesAndJpaInsideBoundedContext() {
-		JavaClasses classes = new ClassFileImporter().importPackages(PROJECT_PACKAGE);
+		JavaClasses classes = new ClassFileImporter().withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+			.importPackages(PROJECT_PACKAGE);
 		classes().that(needBoundedContext())
 			.should(resideInBoundedContext(classes))
 			.because("JMolecules and JPA classes must be inside a bounded context")
@@ -195,7 +204,8 @@ public class DDDStructureTests {
 
 	@Test
 	void enforceBoundedContextIsolation() {
-		JavaClasses classes = new ClassFileImporter().importPackages(PROJECT_PACKAGE);
+		JavaClasses classes = new ClassFileImporter().withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+			.importPackages(PROJECT_PACKAGE);
 		classes().that(resideInAnyBoundedContext(classes))
 			.should(notDependOnOtherContextUnlessAllowed(classes))
 			.because(
